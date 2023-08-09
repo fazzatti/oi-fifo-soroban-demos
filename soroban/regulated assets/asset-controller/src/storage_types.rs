@@ -6,8 +6,8 @@ pub(crate) const BALANCE_BUMP_AMOUNT: u32 = 518400; // 30 days
 #[derive(Clone)]
 #[contracttype]
 pub struct AffiliationDataKey {
-    pub primary: Affiliate,
-    pub secondary: Affiliate,
+    pub primary: Address,
+    pub secondary: Address,
 }
 
 pub struct AffiliationValue {
@@ -15,7 +15,7 @@ pub struct AffiliationValue {
     pub outflow: i128,
 }
 
-
+#[derive(Clone)]
 #[contracttype]
 pub struct AllowanceValue {
     pub amount: i128,
