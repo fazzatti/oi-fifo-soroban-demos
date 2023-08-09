@@ -1,6 +1,6 @@
 
 use soroban_sdk::{contract, contractimpl, Address, Env};
-use crate::rules::hasSpenderAchievedOutflowLimit;
+use crate::rules::has_spender_achieved_outflow_limit;
 use crate::asset::write_asset;
 use crate::data::write_outflow_limit;
 use crate::admin::{has_administrator,write_administrator};
@@ -68,8 +68,8 @@ impl AssetControllerTrait for AssetController {
         amount: i128,) -> bool  {
 
 
-        //make sure invoker is spender
-        hasSpenderAchievedOutflowLimit(&e, spender,amount);
+        //make sure invoker is asset contract
+        has_spender_achieved_outflow_limit(&e, spender,amount);
 
 
 

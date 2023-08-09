@@ -14,7 +14,7 @@ use soroban_token_sdk::TokenMetadata;
 
 
 
-mod asset_controller_contract = "../../asset_controller.....";
+// mod asset_controller_contract = "../../asset_controller.....";
 
 pub trait RegulatedAssetTrait {
 

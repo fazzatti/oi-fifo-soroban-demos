@@ -22,7 +22,9 @@ pub struct AllowanceValue {
     pub expiration_ledger: u32,
 }
 
-pub struct UserActivity {
+#[derive(Clone)]
+#[contracttype]
+pub struct UserActivityData {
     pub recent_outflow: i128,
     pub recent_inflow: i128,
 }
