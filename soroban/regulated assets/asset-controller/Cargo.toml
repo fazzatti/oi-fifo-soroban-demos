@@ -11,6 +11,8 @@ testutils = ["soroban-sdk/testutils"]
 
 [dependencies]
 soroban-sdk = "0.9.2"
+stellar-xdr = { version = "0.0.1", features = ["next", "std"], optional = true }
+
 
 [dev_dependencies]
 soroban-sdk = { version = "0.9.2", features = ["testutils"] }

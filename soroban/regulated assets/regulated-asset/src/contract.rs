@@ -238,7 +238,9 @@ impl RegulatedAssetTrait for RegulatedAsset {
         // let preprocess_args: Vec<Val> = ().into_val(&env);
 
         let asset_controller_client = asset_controller_contract::Client::new(&e, &asset_controller);
-        asset_controller_client.preprocess_outflow(&from,&to, &amount);
+        
+        assert!(asset_controller_client.preprocess_outflow(&from,&to, &amount) == true,
+    "Transfer failed the preprocessing of outflow rules.");
 
 
         spend_balance(&e, from.clone(), amount);

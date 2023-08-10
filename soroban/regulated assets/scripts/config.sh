@@ -12,11 +12,17 @@ export AC_DEPLOYER_ACCOUNT_SK=${ADMIN_SK}
 export AC_DEPLOY_OUTPUT_FILE="ac-deploy"
 export AC_CONTRACT_ID=$(<"${DATA_DIR}/${AC_DEPLOY_OUTPUT_FILE}-out")
 
+export AC_ADMIN_PK=${ADMIN_PK}
+export AC_ADMIN_SK=${ADMIN_SK}
+
+export OUTFLOW_LIMIT=100
 
 # Regulated Asset
 export RA_WASM="../regulated-asset/target/wasm32-unknown-unknown/release/regulated_asset.wasm"
 export RA_DEPLOYER_ACCOUNT_SK=${ADMIN_SK}
 export RA_DEPLOY_OUTPUT_FILE="ra-deploy"
+export RA_CONTRACT_ID=$(<"${DATA_DIR}/${RA_DEPLOY_OUTPUT_FILE}-out")
+
 
 export RA_ADMIN_PK=${ADMIN_PK}
 export RA_ADMIN_SK=${ADMIN_SK}
@@ -25,8 +31,11 @@ export RA_NAME="FifoCoin"
 export RA_SYMBOL="FIFO"
 
 
-#ACCOUNTS
-
-export USER_PK="GALTHRNM4QZCHF7T3L5BMTWXEIUNNMBXADSFSYTYZ6WFMMIV5HYMQ7TQ"   #The Public key of the account that represents a user
-export USER_SK="SDGXLEHK2ZC57TPMNXCUXYF42OPXPST3KNOP4LYA3OFTPGCTQ4SIB2S2"   #The Secret key of the account that represents a user
+#USER ACCOUNTS
+export USER_A_PK="GC45QSBFYHGQUIWWQEOZ43INQGXX57CSSAABWRZ325H7MNFIFWZ56FD4"   #The Public key of the account that represents a user
+export USER_A_SK="SCMEJMTU57FOOUW5JOKIEGUHLORE36JJKHMLS2E6QPGDQ32CRWFWIZGD"   #The Secret key of the account that represents a user
+export USER_B_PK="GDOGCPASYE37XXAEDCY5DKDXUFBLJC63NWQFPQWUP6AA6DQCSULUOUK5"   #The Public key of the account that represents a user
+export USER_B_SK="SA5FLB42EENZQWTYJASFY4N43J257BKY5ZET6VIVU625KONF5P7P6XEP"   #The Secret key of the account that represents a user
+export USER_C_PK="GBWMCTQCRROOLYVBXQGJLXRXNPKAN2GFGNB7RFJOSVLD7EBQF4OI2GDM"   #The Public key of the account that represents a user
+export USER_C_SK="SCOMBFLTEGYE7JRIGVJHYWU5AAT7H2IRSJACWPY5BAQV5K7W7UTKR4Z3"   #The Secret key of the account that represents a user
 

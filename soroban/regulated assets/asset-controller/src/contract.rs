@@ -4,6 +4,7 @@ use crate::rules::has_spender_achieved_outflow_limit;
 use crate::asset::write_asset;
 use crate::data::write_outflow_limit;
 use crate::admin::{has_administrator,write_administrator};
+use crate::validations::is_invoker_the_asset_contract;
 
 pub trait AssetControllerTrait {
 
@@ -16,6 +17,8 @@ pub trait AssetControllerTrait {
         from: Address,
         to: Address,
         amount: i128,) -> bool;
+    
+    fn test(env: Env);
     // fn allow();
 
     //Transfer from goin out
@@ -65,7 +68,8 @@ impl AssetControllerTrait for AssetController {
         to: Address,
         amount: i128,) -> bool  {
 
-
+    
+    
         //make sure invoker is asset contract
         has_spender_achieved_outflow_limit(&e, from,amount);
 
@@ -73,5 +77,10 @@ impl AssetControllerTrait for AssetController {
 
         return true;
     }
+
+    fn test(e: Env){
+        is_invoker_the_asset_contract(e);
+    }
+
 
 }
