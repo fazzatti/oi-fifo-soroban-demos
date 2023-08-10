@@ -1,21 +1,30 @@
 
-// use soroban_sdk::{contract, contractimpl, Address, Env, token};
+// use {contract, contractimpl, Address, Env, token};
 // use crate::storage_types::DataKey;
 use crate::admin::{has_administrator, read_administrator, write_administrator};
-use crate::admin::read_asset_controller;
+use crate::asset_control::{write_asset_controller, read_asset_controller};
 use crate::allowance::{read_allowance, spend_allowance, write_allowance};
 use crate::balance::{is_authorized, write_authorization};
 use crate::balance::{read_balance, receive_balance, spend_balance};
 use crate::event;
+use crate::validations::check_nonnegative_amount;
 use crate::metadata::{read_decimal, read_name, read_symbol, write_metadata};
 use crate::storage_types::INSTANCE_BUMP_AMOUNT;
 use soroban_sdk::{contract, contractimpl, Address, Env, String};
 use soroban_token_sdk::TokenMetadata;
 
+//../../asset_controller/target/wasm32-unknown-unknown/release/asset_controller.wasm
 
 
-// mod asset_controller_contract = "../../asset_controller.....";
 
+
+mod asset_controller_contract { 
+    soroban_sdk::contractimport!( 
+        file = "./asset_controller.wasm"
+    );
+}
+
+    
 pub trait RegulatedAssetTrait {
 
 
@@ -31,7 +40,7 @@ pub trait RegulatedAssetTrait {
     /// Clawback "amount" from "from" account. "amount" is burned.
     /// Emit event with topics = ["clawback", admin: Address, to: Address], data = [amount: i128]
     fn clawback(
-        env: soroban_sdk::Env,
+        env: Env,
         from: Address,
         amount: i128,
     );
@@ -39,7 +48,7 @@ pub trait RegulatedAssetTrait {
     /// Mints "amount" to "to".
     /// Emit event with topics = ["mint", admin: Address, to: Address], data = [amount: i128]
     fn mint(
-        env: soroban_sdk::Env,
+        env: Env,
         to: Address,
         amount: i128,
     );
@@ -47,7 +56,7 @@ pub trait RegulatedAssetTrait {
     /// Sets the administrator to the specified address "new_admin".
     /// Emit event with topics = ["set_admin", admin: Address], data = [new_admin: Address]
     fn set_admin(
-        env: soroban_sdk::Env,
+        env: Env,
         new_admin: Address,
     );
 
@@ -55,7 +64,7 @@ pub trait RegulatedAssetTrait {
     /// If "authorized" is true, "id" should be able to use its balance.
     /// Emit event with topics = ["set_authorized", id: Address], data = [authorize: bool]
     fn set_authorized(
-        env: soroban_sdk::Env,
+        env: Env,
         id: Address,
         authorized: bool,
     );
@@ -75,7 +84,7 @@ pub trait RegulatedAssetTrait {
     /// should be treated as a 0 amount allowance.
     /// Emit event with topics = ["approve", from: Address, spender: Address], data = [amount: i128, expiration_ledger: u32]
     fn approve(
-        env: soroban_sdk::Env,
+        env: Env,
         from: Address,
         spender: Address,
         amount: i128,
@@ -85,7 +94,7 @@ pub trait RegulatedAssetTrait {
     /// Transfer "amount" from "from" to "to".
     /// Emit event with topics = ["transfer", from: Address, to: Address], data = [amount: i128]
     fn transfer(
-        env: soroban_sdk::Env,
+        env: Env,
         from: Address,
         to: Address,
         amount: i128,
@@ -95,7 +104,7 @@ pub trait RegulatedAssetTrait {
     /// Authorized by spender (`spender.require_auth()`).
     /// Emit event with topics = ["transfer", from: Address, to: Address], data = [amount: i128]
     fn transfer_from(
-        env: soroban_sdk::Env,
+        env: Env,
         spender: Address,
         from: Address,
         to: Address,
@@ -105,7 +114,7 @@ pub trait RegulatedAssetTrait {
     /// Burn "amount" from "from".
     /// Emit event with topics = ["burn", from: Address], data = [amount: i128]
     fn burn(
-        env: soroban_sdk::Env,
+        env: Env,
         from: Address,
         amount: i128,
     );
@@ -113,7 +122,7 @@ pub trait RegulatedAssetTrait {
     /// Burn "amount" from "from", consuming the allowance of "spender".
     /// Emit event with topics = ["burn", from: Address], data = [amount: i128]
     fn burn_from(
-        env: soroban_sdk::Env,
+        env: Env,
         spender: Address,
         from: Address,
         amount: i128,
@@ -127,19 +136,19 @@ pub trait RegulatedAssetTrait {
     // events.
 
     /// Get the balance of "id".
-    fn balance(env: soroban_sdk::Env, id: Address) -> i128;
+    fn balance(env: Env, id: Address) -> i128;
 
     /// Get the spendable balance of "id". This will return the same value as balance()
     /// unless this is called on the Stellar Asset Contract, in which case this can
     /// be less due to reserves/liabilities.
-    fn spendable_balance(env: soroban_sdk::Env id: Address) -> i128;
+    fn spendable_balance(env: Env, id: Address) -> i128;
 
     // Returns true if "id" is authorized to use its balance.
-    fn authorized(env: soroban_sdk::Env, id: Address) -> bool;
+    fn authorized(env: Env, id: Address) -> bool;
 
     /// Get the allowance for "spender" to transfer from "from".
     fn allowance(
-        env: soroban_sdk::Env,
+        env: Env,
         from: Address,
         spender: Address,
     ) -> i128;
@@ -149,13 +158,13 @@ pub trait RegulatedAssetTrait {
     // --------------------------------------------------------------------------------
 
     // Get the number of decimals used to represent amounts of this token.
-    fn decimals(env: soroban_sdk::Env) -> u32;
+    fn decimals(env: Env) -> u32;
 
     // Get the name for this token.
-    fn name(env: soroban_sdk::Env) -> soroban_sdk::Bytes;
+    fn name(env: Env) -> String;
 
     // Get the symbol for this token.
-    fn symbol(env: soroban_sdk::Env) -> soroban_sdk::Bytes;
+    fn symbol(env: Env) -> String;
         
 }
 
@@ -226,10 +235,10 @@ impl RegulatedAssetTrait for RegulatedAsset {
 
         let asset_controller = read_asset_controller(&e);
 
-        let preprocess_args: Vec<Val> = ().into_val(&env);
+        // let preprocess_args: Vec<Val> = ().into_val(&env);
 
         let asset_controller_client = asset_controller_contract::Client::new(&e, &asset_controller);
-        asset_controller_client.preprocess_outflow(spender as Address,from as Address,to as Address, amount as i128);
+        asset_controller_client.preprocess_outflow(&from,&to, &amount);
 
 
         spend_balance(&e, from.clone(), amount);

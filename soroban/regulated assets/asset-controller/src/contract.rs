@@ -13,7 +13,6 @@ pub trait AssetControllerTrait {
 
     //Transfer goin out
     fn preprocess_outflow(env: Env, 
-        spender: Address,
         from: Address,
         to: Address,
         amount: i128,) -> bool;
@@ -62,14 +61,13 @@ impl AssetControllerTrait for AssetController {
     }
 
     fn preprocess_outflow(e: Env, 
-        spender: Address,
         from: Address,
         to: Address,
         amount: i128,) -> bool  {
 
 
         //make sure invoker is asset contract
-        has_spender_achieved_outflow_limit(&e, spender,amount);
+        has_spender_achieved_outflow_limit(&e, from,amount);
 
 
 
