@@ -63,6 +63,10 @@ case "$FUNCTION" in
     FUNCTION_NAME="balance"
     ARGS="--id $(get_user_pk $1)"
     ;;
+  test)
+    FUNCTION_NAME="test"
+    ARGS=""
+    ;;
   *)
     echo "Error: Invalid function $FUNCTION" >&2 # Print to stderr
     exit 1 # Exit the script

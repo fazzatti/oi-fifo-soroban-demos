@@ -20,9 +20,10 @@ use soroban_token_sdk::TokenMetadata;
 
 mod asset_controller_contract { 
     soroban_sdk::contractimport!( 
-        file = "./asset_controller.wasm"
+        file = "../asset-controller/target/wasm32-unknown-unknown/release/asset_controller.wasm"
     );
 }
+
 
     
 pub trait RegulatedAssetTrait {
@@ -165,7 +166,9 @@ pub trait RegulatedAssetTrait {
 
     // Get the symbol for this token.
     fn symbol(env: Env) -> String;
-        
+
+    fn test(env:Env);
+
 }
 
 
@@ -239,8 +242,7 @@ impl RegulatedAssetTrait for RegulatedAsset {
 
         let asset_controller_client = asset_controller_contract::Client::new(&e, &asset_controller);
         
-        assert!(asset_controller_client.preprocess_outflow(&from,&to, &amount) == true,
-    "Transfer failed the preprocessing of outflow rules.");
+        asset_controller_client.preprocess_outflow(&from,&to, &amount);
 
 
         spend_balance(&e, from.clone(), amount);
@@ -339,116 +341,10 @@ impl RegulatedAssetTrait for RegulatedAsset {
     }
 
 
+    fn test(e:Env){
 
-
-    // fn initialize(env: Env, admin:Address, asset: Address,  term: u64, yield_rate: u64, min_deposit: i128, penalty_rate: u64) { 
-    //     assert!( 
-    //         !is_initialized(&env), 
-    //         "contract already initialized"
-    //     );
-    
-    //     //TODO: Validate provided arguments as valid asset and valid parameters for the use case
-    //     env.storage().persistent().set(&DataKey::Admin, &admin);
-    //     env.storage().persistent().set(&DataKey::Asset, &asset);
-    //     env.storage().persistent().set(&DataKey::Term, &term);
-    //     env.storage().persistent().set(&DataKey::YieldRate, &yield_rate);
-    //     env.storage().persistent().set(&DataKey::MinDeposit, &min_deposit);
-    //     env.storage().persistent().set(&DataKey::PenaltyRate, &penalty_rate);           
-    // }
-
-    // fn admin_withdraw(env: Env, amount: i128, address: Address){
-
-    //     let admin = get_admin(&env);
-    //     admin.require_auth();
-
-    //     send_funds_to_address(&env, amount, address.clone());
-    // }
-
-    // fn deposit(env: Env, amount: i128, address: Address){
-        
-    //     address.require_auth();
-
-    //     assert!(
-    //         is_initialized(&env),
-    //         "Contract has not been initialized!"
-    //     );
-
-    //     assert!(
-    //         is_deposit_valid(&env, amount),
-    //         "Insufficient deposit amount."
-    //     );
-        
-    //     assert!(
-    //         has_not_active_deposit(&env, address.clone()),
-    //         "User has an active deposit."
-    //     );
-        
-
-    //     let asset_address: Address = get_asset(&env);       
-    //     let token_client = token::Client::new(&env, &asset_address);
-
-    //     token_client.transfer(&address, &env.current_contract_address(), &amount);
-    //     set_user_position(&env, address, amount, env.ledger().timestamp());
-
-    // }
-
-
-    // fn withdraw(env: Env, address: Address, accept_premature_withdraw : bool){
-
-    //     address.require_auth();
-
-    //     assert!(
-    //         is_initialized(&env),
-    //         "Contract has not been initialized!"
-    //     );
-
-    //     assert!(
-    //         has_active_deposit(&env, address.clone()),
-    //         "User doesn't have an active deposit."
-    //     );
-        
-    //     if !accept_premature_withdraw {
-    //         assert!(
-    //             has_achieved_completion(&env, address.clone()),
-    //             "Term hasn't been achieved."
-    //         );
-    //     }
-        
-    //     execute_withdraw(&env, address.clone());
-    // }
-    
-      
-
-    // fn get_estimated_yield(env: Env, address: Address) -> i128 {
-    //     return calculate_yield(&env, address);
-    // }
-
-    // fn get_position(env: Env, address: Address) -> i128 {
-    //     let deposit_amount = get_deposit_amount(&env,address.clone());
-    //     return deposit_amount + calculate_yield(&env, address);
-    // }
-
-    // fn get_estimated_premature_withdraw(env: Env, address: Address) -> i128 {
-    //     let balance_premature: i128 = calculate_withdraw(&env, address.clone());
-    //     return balance_premature;
-    // }
-
-    // fn get_time_left(env: Env, address: Address) -> u64 {
-
-    //     assert!(
-    //         has_active_deposit(&env, address.clone()),
-    //         "User doesn't have an active deposit."
-    //     );
-
-    //     let deposit_time = get_deposit_timestamp(&env, address);
-    //     let term = get_term(&env);
-    //     let elapsed_time = env.ledger().timestamp() - deposit_time;
-        
-    //     if elapsed_time >= term  {
-    //         0
-    //     }else{
-    //        return term - elapsed_time;
-    //     }
-    // }
-
+        let asset_controller = read_asset_controller(&e);
+        let asset_controller_client = asset_controller_contract::Client::new(&e, &asset_controller);      
+        return asset_controller_client.test();
+    }
 }

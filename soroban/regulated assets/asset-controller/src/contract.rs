@@ -1,14 +1,14 @@
 
 use soroban_sdk::{contract, contractimpl, Address, Env};
-use crate::rules::has_spender_achieved_outflow_limit;
-use crate::asset::write_asset;
-use crate::data::write_outflow_limit;
-use crate::admin::{has_administrator,write_administrator};
+use crate::rules::{has_spender_achieved_outflow_limit, has_receiver_achieved_inflow_limit};
+use crate::asset::{write_asset,read_asset};
+use crate::data::(write_outflow_limit,write_inflow_limit);
+use crate::admin::{has_administrator,write_administrator,read_administrator};
 use crate::validations::is_invoker_the_asset_contract;
 
 pub trait AssetControllerTrait {
 
-    fn initialize(e: Env, asset: Address, admin: Address, outflow_limit: i128 );
+    fn initialize(e: Env, asset: Address, admin: Address, outflow_limit: i128, inflow_limit: i128 );
     // fn inflow();
     // fn delegated_inflow();
 
@@ -18,7 +18,7 @@ pub trait AssetControllerTrait {
         to: Address,
         amount: i128,) -> bool;
     
-    fn test(env: Env);
+    fn test(env: Env)  ;
     // fn allow();
 
     //Transfer from goin out
@@ -47,19 +47,24 @@ pub trait AssetControllerTrait {
 
 }
 
+
+
+
 #[contract]
 pub struct AssetController;
 
 #[contractimpl]
 impl AssetControllerTrait for AssetController {
 
-    fn initialize(e: Env, admin: Address, asset: Address, outflow_limit: i128) {
+    fn initialize(e: Env, admin: Address, asset: Address, outflow_limit: i128, inflow_limit: i128 ) {
         if has_administrator(&e) {
-            panic!("already initialized")
+            panic!("Already initialized!")
         }
         write_administrator(&e, &admin);
         write_asset(&e, &asset);
+
         write_outflow_limit(&e,outflow_limit);
+        write_inflow_limit(&e,inflow_limit);
       
     }
 
@@ -68,19 +73,22 @@ impl AssetControllerTrait for AssetController {
         to: Address,
         amount: i128,) -> bool  {
 
-    
-    
-        //make sure invoker is asset contract
+        is_invoker_the_asset_contract(e);    
         has_spender_achieved_outflow_limit(&e, from,amount);
+        has_receiver_achieved_inflow_limit(&e, to,amount);
+        
 
-
-
+        
+        
         return true;
     }
 
     fn test(e: Env){
+        
         is_invoker_the_asset_contract(e);
+        
     }
+
 
 
 }

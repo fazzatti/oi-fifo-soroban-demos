@@ -15,7 +15,8 @@ export AC_CONTRACT_ID=$(<"${DATA_DIR}/${AC_DEPLOY_OUTPUT_FILE}-out")
 export AC_ADMIN_PK=${ADMIN_PK}
 export AC_ADMIN_SK=${ADMIN_SK}
 
-export OUTFLOW_LIMIT=100
+export OUTFLOW_LIMIT=1000
+export INFLOW_LIMIT=700
 
 # Regulated Asset
 export RA_WASM="../regulated-asset/target/wasm32-unknown-unknown/release/regulated_asset.wasm"

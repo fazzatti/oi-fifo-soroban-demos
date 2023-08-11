@@ -10,15 +10,27 @@ NS='\033[0m' # No Color
 
 TARGET=$1
 shift
-
 case "$TARGET" in
-  all|ac)
+  all)
+    echo -e "\n ${STYLE}DEPLOYING ASSET CONTROLLER CONTRACT...${NS}"
+    ./helpers/deploy.sh ${AC_WASM} ${AC_DEPLOYER_ACCOUNT_SK} ${AC_DEPLOY_OUTPUT_FILE}
+    
+    echo -e "\n ${STYLE}DEPLOYING REGULATED ASSET CONTRACT...${NS}"
+    ./helpers/deploy.sh ${RA_WASM} ${RA_DEPLOYER_ACCOUNT_SK} ${RA_DEPLOY_OUTPUT_FILE}
+    
+    echo -e "\n ${STYLE}INITIALIZING ASSET CONTROLLER CONTRACT...${NS}"
+    ./helpers/initialize-ac.sh
+    
+    echo -e "\n ${STYLE}INITIALIZING REGULATED ASSET CONTRACT...${NS}"
+    ./helpers/initialize-ra.sh
+    ;;
+  ac)
     echo -e "\n ${STYLE}DEPLOYING ASSET CONTROLLER CONTRACT...${NS}"
     ./helpers/deploy.sh ${AC_WASM} ${AC_DEPLOYER_ACCOUNT_SK} ${AC_DEPLOY_OUTPUT_FILE}
     echo -e "\n ${STYLE}INITIALIZING ASSET CONTROLLER CONTRACT...${NS}"
     ./helpers/initialize-ac.sh
     ;;
-  all|ra)
+  ra)
     echo -e "\n ${STYLE}DEPLOYING REGULATED ASSET CONTRACT...${NS}"
     ./helpers/deploy.sh ${RA_WASM} ${RA_DEPLOYER_ACCOUNT_SK} ${RA_DEPLOY_OUTPUT_FILE}
     echo -e "\n ${STYLE}INITIALIZING REGULATED ASSET CONTRACT...${NS}"

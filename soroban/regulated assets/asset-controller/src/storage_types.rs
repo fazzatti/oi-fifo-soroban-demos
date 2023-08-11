@@ -1,5 +1,6 @@
 use soroban_sdk::{contracttype, Address};
 
+pub(crate) const TEMPORARY_BUMP_AMOUNT: u32 = 17280; // 1 day
 pub(crate) const INSTANCE_BUMP_AMOUNT: u32 = 34560; // 2 days
 pub(crate) const BALANCE_BUMP_AMOUNT: u32 = 518400; // 30 days
 
@@ -37,4 +38,5 @@ pub enum DataKey {
     Asset,                
     UserActivity(Address),
     OutflowLimit,
+    InflowLimit,
 }

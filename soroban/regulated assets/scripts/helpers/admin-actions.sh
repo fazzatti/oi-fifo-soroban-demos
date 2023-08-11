@@ -52,6 +52,12 @@ case "$FUNCTION" in
     FUNCTION_NAME="mint"
     ARGS="--to $(get_user_pk $2) --amount $3"
     ;;
+  test)
+    INVOKER_SK=${AC_ADMIN_SK}
+    CONTRACT_ID=${AC_CONTRACT_ID}
+    FUNCTION_NAME="test"
+    ARGS=""
+    ;;
   *)
     echo "Error: Invalid function $FUNCTION" >&2 # Print to stderr
     exit 1 # Exit the script

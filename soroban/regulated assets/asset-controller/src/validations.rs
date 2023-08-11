@@ -1,14 +1,18 @@
 
-use soroban_sdk::{contract, Address, Env, Account};
-use crate::admin::read_administrator;
+use soroban_sdk::{contract, Address, Env};
+use crate::asset::read_asset;
 
 
 pub fn is_invoker_the_asset_contract(e:Env){
-
-    // let invoker = ;
-
-
-    assert!(read_administrator(&e) == invoker, 
-    "Invoker is not the registered regulated asset!");
-
+    let call_stack = e.call_stack();
+    
+    if call_stack.len() >= 2 {
+        // Get the address of the contract invoked before the current one
+        if let Some((address, _)) = call_stack.get(call_stack.len() - 2) {
+            assert!(address == read_asset(&e),
+                    "Asset controller invoker is not the registered asset.");
+        }
+    }else{
+        panic!("Asset controller was invoked directly.");
+    }
 }
