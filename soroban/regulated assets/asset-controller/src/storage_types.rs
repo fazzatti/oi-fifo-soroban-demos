@@ -1,4 +1,4 @@
-use soroban_sdk::{contracttype, Address};
+use soroban_sdk::{contracttype, Address, Vec};
 
 pub(crate) const TEMPORARY_BUMP_AMOUNT: u32 = 17280; // 1 day
 pub(crate) const INSTANCE_BUMP_AMOUNT: u32 = 34560; // 2 days
@@ -26,9 +26,22 @@ pub struct AllowanceValue {
 #[derive(Clone)]
 #[contracttype]
 pub struct UserActivityData {
-    pub recent_outflow: i128,
-    pub recent_inflow: i128,
+    pub outflow: Vec<ActivityEntry>,
+    pub inflow: Vec<ActivityEntry>,
 }
+
+#[derive(Clone)]
+#[contracttype]
+pub struct ActivityEntry{
+    pub amount: i128,
+    pub timestamp:u64,
+}
+
+// pub struct UserActivityData {
+//     pub recent_outflow: i128,
+//     pub recent_inflow: i128,
+// }
+
 
 #[derive(Clone)]
 #[contracttype]
@@ -39,4 +52,5 @@ pub enum DataKey {
     UserActivity(Address),
     OutflowLimit,
     InflowLimit,
+    QuotaTimeLimit,                  //u64
 }

@@ -17,4 +17,6 @@ RA_CONTRACT_ID_UPDT=$(<"${DATA_DIR}/${RA_DEPLOY_OUTPUT_FILE}-out")
    --asset ${RA_CONTRACT_ID_UPDT} \
    --admin ${AC_ADMIN_PK} \
    --outflow_limit ${OUTFLOW_LIMIT} \
+   --inflow_limit ${INFLOW_LIMIT} \
+   --quota_time_limit ${QUOTA_TIME_LIMIT} \
   

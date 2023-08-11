@@ -52,6 +52,12 @@ case "$FUNCTION" in
     FUNCTION_NAME="mint"
     ARGS="--to $(get_user_pk $2) --amount $3"
     ;;
+  quota)
+    INVOKER_SK=${AC_ADMIN_SK}
+    CONTRACT_ID=${AC_CONTRACT_ID}
+    FUNCTION_NAME="get_quota"
+    ARGS="--user $(get_user_pk $2)"
+    ;;
   test)
     INVOKER_SK=${AC_ADMIN_SK}
     CONTRACT_ID=${AC_CONTRACT_ID}

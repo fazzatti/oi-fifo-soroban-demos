@@ -3,7 +3,7 @@ use soroban_sdk::{contract, Address, Env};
 use crate::asset::read_asset;
 
 
-pub fn is_invoker_the_asset_contract(e:Env){
+pub fn is_invoker_the_asset_contract(e:&Env){
     let call_stack = e.call_stack();
     
     if call_stack.len() >= 2 {
