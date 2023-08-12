@@ -17,7 +17,7 @@ export AC_ADMIN_SK=${ADMIN_SK}
 
 export OUTFLOW_LIMIT=1000
 export INFLOW_LIMIT=700
-export QUOTA_TIME_LIMIT=300
+export QUOTA_TIME_LIMIT=100  #17280 #1 day
 
 
 # Regulated Asset

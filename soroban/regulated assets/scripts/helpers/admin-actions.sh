@@ -15,6 +15,9 @@ get_user_pk(){
     b)
         echo ${USER_B_PK}
         ;;
+    c)
+        echo ${USER_C_PK}
+        ;;
     *)
         echo "Error: Invalid user $user" >&2 # Print to stderr
         exit 1 # Exit the script
@@ -30,6 +33,9 @@ get_user_sk(){
         ;;
     b)
         echo ${USER_B_SK}
+        ;;
+    c)
+        echo ${USER_C_SK}
         ;;
     *)
         echo "Error: Invalid user $user" >&2 # Print to stderr
@@ -56,7 +62,7 @@ case "$FUNCTION" in
     INVOKER_SK=${AC_ADMIN_SK}
     CONTRACT_ID=${AC_CONTRACT_ID}
     FUNCTION_NAME="get_quota"
-    ARGS="--user $(get_user_pk $2)"
+    ARGS="--id $(get_user_pk $2)"
     ;;
   test)
     INVOKER_SK=${AC_ADMIN_SK}

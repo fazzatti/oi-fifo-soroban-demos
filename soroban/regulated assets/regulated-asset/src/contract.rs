@@ -237,12 +237,9 @@ impl RegulatedAssetTrait for RegulatedAsset {
         e.storage().instance().bump(INSTANCE_BUMP_AMOUNT);
 
         let asset_controller = read_asset_controller(&e);
-
-        // let preprocess_args: Vec<Val> = ().into_val(&env);
-
         let asset_controller_client = asset_controller_contract::Client::new(&e, &asset_controller);
         
-        asset_controller_client.preprocess_outflow(&from,&to, &amount);
+        asset_controller_client.review_transfer(&from,&to, &amount);
 
 
         spend_balance(&e, from.clone(), amount);

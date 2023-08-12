@@ -1,9 +1,5 @@
 use soroban_sdk::{contracttype, Address, Vec};
 
-pub(crate) const TEMPORARY_BUMP_AMOUNT: u32 = 17280; // 1 day
-pub(crate) const INSTANCE_BUMP_AMOUNT: u32 = 34560; // 2 days
-pub(crate) const BALANCE_BUMP_AMOUNT: u32 = 518400; // 30 days
-
 #[derive(Clone)]
 #[contracttype]
 pub struct AffiliationDataKey {
@@ -25,16 +21,31 @@ pub struct AllowanceValue {
 
 #[derive(Clone)]
 #[contracttype]
-pub struct UserActivityData {
-    pub outflow: Vec<ActivityEntry>,
-    pub inflow: Vec<ActivityEntry>,
+pub struct AccountActivityData {
+    pub outflow: Vec<TxEntry>,
+    pub inflow: Vec<TxEntry>,
 }
 
 #[derive(Clone)]
 #[contracttype]
-pub struct ActivityEntry{
+pub struct TxEntry{
     pub amount: i128,
     pub timestamp:u64,
+}
+
+
+#[derive(Clone)]
+#[contracttype]
+pub struct AccountQuotaReleaseData {
+    pub outflow: Vec<TxReleaseEntry>,
+    pub inflow: Vec<TxReleaseEntry>,
+}
+
+#[derive(Clone)]
+#[contracttype]
+pub struct TxReleaseEntry{
+    pub amount: i128,
+    pub time_left:u64,
 }
 
 // pub struct UserActivityData {
@@ -49,7 +60,7 @@ pub enum DataKey {
     Affiliation(AffiliationDataKey),
     Admin,         
     Asset,                
-    UserActivity(Address),
+    AccountActivity(Address),
     OutflowLimit,
     InflowLimit,
     QuotaTimeLimit,                  //u64
