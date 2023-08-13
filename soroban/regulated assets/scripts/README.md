@@ -38,13 +38,13 @@ For the full list of commands run the following:
     - `quota release <user>`: Find out the quota release time for a user.
 
 2. **Regulated Asset Contract (`ra`)**:
-   -`name`: Asset's name.
-   -`symbol`: Asset's symbol.
-   -`decimals`: Number of decimals.
-   -`authorized <USER>`: Check if a user is authorized.
-   -`balance <USER>`: Get balance of a user.
-   -`spendable <USER>`: Know spendable balance of a user.
-   -`allowance <FROM> <SPENDER>`: Get the allowance from one user to another.
+    - `name`: Asset's name.
+    - `symbol`: Asset's symbol.
+    - `decimals`: Number of decimals.
+    - `authorized <USER>`: Check if a user is authorized.
+    - `balance <USER>`: Get balance of a user.
+    - `spendable <USER>`: Know spendable balance of a user.
+    - `allowance <FROM> <SPENDER>`: Get the allowance from one user to another.
 
 
 ### Actors and Commands:
