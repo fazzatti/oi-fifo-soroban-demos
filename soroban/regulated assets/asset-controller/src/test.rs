@@ -14,7 +14,7 @@ use soroban_sdk::{
 
 
 mod asset_contract {
-    soroban_sdk::contractimport!(file = "../regulated-asset/target/wasm32-unknown-unknown/release/regulated_asset.wasm");
+    soroban_sdk::contractimport!(file = "../../../target/wasm32-unknown-unknown/release/regulated_asset.wasm");
 }
 
 fn advance_ledger(e: &Env, delta: u64) {

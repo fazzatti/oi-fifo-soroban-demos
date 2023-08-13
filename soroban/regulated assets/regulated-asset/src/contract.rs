@@ -20,7 +20,7 @@ use soroban_token_sdk::TokenMetadata;
 
 mod asset_controller_contract { 
     soroban_sdk::contractimport!( 
-        file = "../asset-controller/target/wasm32-unknown-unknown/release/asset_controller.wasm"
+        file = "../../../target/wasm32-unknown-unknown/release/asset_controller.wasm"
     );
 }
 
