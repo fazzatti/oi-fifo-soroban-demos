@@ -1,6 +1,7 @@
-use soroban_sdk::{ Address, Env, vec};
-use crate::storage_types::{DataKey, AccountActivityData,  INSTANCE_BUMP_AMOUNT};
+use crate::storage_types::{AccountActivityData, DataKey, INSTANCE_BUMP_AMOUNT};
+use soroban_sdk::{vec, Address, Env};
 
+const LEDGER_TIME_SECONDS: u32 = 5;
 
 pub fn read_outflow_limit(e: &Env) -> i128 {
     let key = DataKey::OutflowLimit;
@@ -11,7 +12,6 @@ pub fn write_outflow_limit(e: &Env, amount: i128) {
     let key = DataKey::OutflowLimit;
     e.storage().instance().set(&key, &amount);
     e.storage().instance().bump(INSTANCE_BUMP_AMOUNT);
-
 }
 pub fn read_inflow_limit(e: &Env) -> i128 {
     let key = DataKey::InflowLimit;
@@ -46,12 +46,11 @@ pub fn write_quota_time_limit(e: &Env, amount: u64) {
     e.storage().instance().bump(INSTANCE_BUMP_AMOUNT);
 }
 
-// The account probation defines how long an account still 
+// The account probation defines how long an account still
 // have remaining as their probation period. Once they begin
 // transacting, their probation time will update. Prior to that
 // it is always the full probation period.
 pub fn read_account_probation_start(e: &Env, id: &Address) -> u64 {
-
     let key = DataKey::AccountProbationStart(id.clone());
     if let Some(account_probation) = e.storage().instance().get::<DataKey, u64>(&key) {
         account_probation
@@ -60,12 +59,10 @@ pub fn read_account_probation_start(e: &Env, id: &Address) -> u64 {
     }
 }
 
-pub fn write_account_probation_start(e: &Env, id: &Address, start:u64) {
-
+pub fn write_account_probation_start(e: &Env, id: &Address, start: u64) {
     let key = DataKey::AccountProbationStart(id.clone());
-    e.storage().instance().set(&key, &start);  
+    e.storage().instance().set(&key, &start);
     e.storage().instance().bump(INSTANCE_BUMP_AMOUNT);
-
 }
 
 //
@@ -80,7 +77,7 @@ pub fn read_account_activity(e: &Env, id: &Address) -> AccountActivityData {
         account_data
     } else {
         AccountActivityData {
-            inflow:  vec![&e],
+            inflow: vec![&e],
             outflow: vec![&e],
         }
     }
@@ -88,17 +85,19 @@ pub fn read_account_activity(e: &Env, id: &Address) -> AccountActivityData {
 
 //
 // Since the temporary data only needs to exist in relation
-// to the quota time limit defined when initializing the 
+// to the quota time limit defined when initializing the
 // contract, here we use it as the bump value to ensure
 // the temporary data doesn't have to live any longer than
 // necessary. Optimizing the contract cost to store data.
 //
 pub fn write_account_activity(e: &Env, id: Address, account_activity: AccountActivityData) {
     let key = DataKey::AccountActivity(id);
-    e.storage().temporary().set(&key, &account_activity);  
-    e.storage().temporary().bump(&key, get_temporary_bump_amount(&e));
+    e.storage().temporary().set(&key, &account_activity);
+    e.storage()
+        .temporary()
+        .bump(&key, get_temporary_bump_amount(&e));
 }
 
-fn get_temporary_bump_amount(e:&Env) -> u32{
-    read_quota_time_limit(&e) as u32
+fn get_temporary_bump_amount(e: &Env) -> u32 {
+    read_quota_time_limit(&e) as u32 / LEDGER_TIME_SECONDS
 }

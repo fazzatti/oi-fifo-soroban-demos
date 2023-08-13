@@ -6,38 +6,32 @@
 # 
 #
 
-CONTRACT_ID=""
-INVOKER_SK=""
+INVOKER_SK=${RA_ADMIN_SK}
+CONTRACT_ID=${RA_CONTRACT_ID}
 FUNCTION_NAME=""
 ARGS=""
 
 
 FUNCTION=$1
 case "$FUNCTION" in
-  m|M)
-    INVOKER_SK=${RA_ADMIN_SK}
-    CONTRACT_ID=${RA_CONTRACT_ID}
+  mint)
     FUNCTION_NAME="mint"
     ARGS="--to $(./helpers/get-account.sh $2 pk) --amount $3"
     ;;
-  quota)
-    INVOKER_SK=${AC_ADMIN_SK}
-    CONTRACT_ID=${AC_CONTRACT_ID}
-    FUNCTION_NAME="get_quota"
-    ARGS="--id $(./helpers/get-account.sh $2 pk)"
-    ;;
   authorize)
-    INVOKER_SK=${RA_ADMIN_SK}
-    CONTRACT_ID=${RA_CONTRACT_ID}
     FUNCTION_NAME="set_authorized"
     ARGS="--id $(./helpers/get-account.sh $2 pk) --authorize"
     ;;
   unauthorize)
-    INVOKER_SK=${RA_ADMIN_SK}
-    CONTRACT_ID=${RA_CONTRACT_ID}
     FUNCTION_NAME="set_authorized"
     ARGS="--id $(./helpers/get-account.sh $2 pk)"
     ;;
+   h) 
+  echo -e "       ${HELP_STYLE} mint <USER> <AMOUNT> ${NS} - Mint x amount to user account."
+  echo -e "       ${HELP_STYLE} authorize <USER>${NS} - Authorize/ Unfreeze user account."
+  echo -e "       ${HELP_STYLE} unauthorize <USER>${NS} - Freeze/ Remove authorization from user account."
+  exit 0
+  ;;
   *)
     echo "Error: Invalid function $FUNCTION" >&2 # Print to stderr
     exit 1 # Exit the script

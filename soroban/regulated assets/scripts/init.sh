@@ -37,8 +37,9 @@ case "$TARGET" in
     ./helpers/initialize-ra.sh
     ;;
   *)
-    echo -e "\n Command invalid. Usage:"
-    echo -e "  ${HELP_STYLE}$0 asset${NS} - Description for the 'asset' command."
-    echo -e "  ${HELP_STYLE}$0 controller${NS} - Description for the 'controller' command."
+    echo -e "\n Usage: init.sh <COMMAND>"
+    echo -e "  ${HELP_STYLE}$0 all${NS} - Deploys and initialize the whole use case."
+    echo -e "  ${HELP_STYLE}$0 asset${NS} - Deploys and initialize the regulated asset."
+    echo -e "  ${HELP_STYLE}$0 controller${NS} - Deploys and initialize the asset controller."
     ;;
 esac

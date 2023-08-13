@@ -16,7 +16,9 @@ RA_CONTRACT_ID_UPDT=$(<"${DATA_DIR}/${RA_DEPLOY_OUTPUT_FILE}-out")
   ${INVOKER_SK} \
    --asset ${RA_CONTRACT_ID_UPDT} \
    --admin ${AC_ADMIN_PK} \
-   --outflow_limit ${OUTFLOW_LIMIT} \
-   --inflow_limit ${INFLOW_LIMIT} \
+   --probation_period ${PROBATION_PERIOD} \
    --quota_time_limit ${QUOTA_TIME_LIMIT} \
+   --inflow_limit ${INFLOW_LIMIT} \
+   --outflow_limit ${OUTFLOW_LIMIT} \
+   
   

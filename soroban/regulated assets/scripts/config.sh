@@ -7,7 +7,7 @@ export ADMIN_PK="GALIALRZJ5EU2IJJSIQEA3D3ZIEHK5HPBHZJFUEPTGQU3MYEKKIUINTY"  #The
 export ADMIN_SK="SCVCU3KWSSLML7MVWKJJB5VKK6R3CMILO5733IBJJ3C5APBWJUOCDUVY"  #The Secret key of the Admin account
 
 # Asset Controller
-export AC_WASM="../asset-controller/target/wasm32-unknown-unknown/release/asset_controller.wasm"
+export AC_WASM="../../../target/wasm32-unknown-unknown/release/asset_controller.wasm"
 export AC_DEPLOYER_ACCOUNT_SK=${ADMIN_SK}
 export AC_DEPLOY_OUTPUT_FILE="ac-deploy"
 export AC_CONTRACT_ID=$(<"${DATA_DIR}/${AC_DEPLOY_OUTPUT_FILE}-out")
@@ -18,10 +18,11 @@ export AC_ADMIN_SK=${ADMIN_SK}
 export OUTFLOW_LIMIT=1000
 export INFLOW_LIMIT=700
 export QUOTA_TIME_LIMIT=100  #17280 #1 day
+export PROBATION_PERIOD=17280 #1 day
 
 
 # Regulated Asset
-export RA_WASM="../regulated-asset/target/wasm32-unknown-unknown/release/regulated_asset.wasm"
+export RA_WASM="../../../target/wasm32-unknown-unknown/release/regulated_asset.wasm"
 export RA_DEPLOYER_ACCOUNT_SK=${ADMIN_SK}
 export RA_DEPLOY_OUTPUT_FILE="ra-deploy"
 export RA_CONTRACT_ID=$(<"${DATA_DIR}/${RA_DEPLOY_OUTPUT_FILE}-out")
