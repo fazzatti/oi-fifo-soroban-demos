@@ -1,5 +1,5 @@
 use soroban_sdk::{ Address, Env, vec};
-use crate::storage_types::{DataKey, AccountActivityData, TxEntry};
+use crate::storage_types::{DataKey, AccountActivityData,  INSTANCE_BUMP_AMOUNT};
 
 
 pub fn read_outflow_limit(e: &Env) -> i128 {
@@ -10,6 +10,8 @@ pub fn read_outflow_limit(e: &Env) -> i128 {
 pub fn write_outflow_limit(e: &Env, amount: i128) {
     let key = DataKey::OutflowLimit;
     e.storage().instance().set(&key, &amount);
+    e.storage().instance().bump(INSTANCE_BUMP_AMOUNT);
+
 }
 pub fn read_inflow_limit(e: &Env) -> i128 {
     let key = DataKey::InflowLimit;
@@ -19,7 +21,20 @@ pub fn read_inflow_limit(e: &Env) -> i128 {
 pub fn write_inflow_limit(e: &Env, amount: i128) {
     let key = DataKey::InflowLimit;
     e.storage().instance().set(&key, &amount);
+    e.storage().instance().bump(INSTANCE_BUMP_AMOUNT);
 }
+
+pub fn read_probation_period(e: &Env) -> u64 {
+    let key = DataKey::ProbationPeriod;
+    e.storage().instance().get(&key).unwrap()
+}
+
+pub fn write_probation_period(e: &Env, amount: u64) {
+    let key = DataKey::ProbationPeriod;
+    e.storage().instance().set(&key, &amount);
+    e.storage().instance().bump(INSTANCE_BUMP_AMOUNT);
+}
+
 pub fn read_quota_time_limit(e: &Env) -> u64 {
     let key = DataKey::QuotaTimeLimit;
     e.storage().instance().get(&key).unwrap()
@@ -28,6 +43,29 @@ pub fn read_quota_time_limit(e: &Env) -> u64 {
 pub fn write_quota_time_limit(e: &Env, amount: u64) {
     let key = DataKey::QuotaTimeLimit;
     e.storage().instance().set(&key, &amount);
+    e.storage().instance().bump(INSTANCE_BUMP_AMOUNT);
+}
+
+// The account probation defines how long an account still 
+// have remaining as their probation period. Once they begin
+// transacting, their probation time will update. Prior to that
+// it is always the full probation period.
+pub fn read_account_probation_start(e: &Env, id: &Address) -> u64 {
+
+    let key = DataKey::AccountProbationStart(id.clone());
+    if let Some(account_probation) = e.storage().instance().get::<DataKey, u64>(&key) {
+        account_probation
+    } else {
+        e.ledger().timestamp()
+    }
+}
+
+pub fn write_account_probation_start(e: &Env, id: &Address, start:u64) {
+
+    let key = DataKey::AccountProbationStart(id.clone());
+    e.storage().instance().set(&key, &start);  
+    e.storage().instance().bump(INSTANCE_BUMP_AMOUNT);
+
 }
 
 //

@@ -1,4 +1,4 @@
-use soroban_sdk::{ Address, Env, Vec, vec, log};
+use soroban_sdk::{ Address, Env, Vec, vec};
 use crate::data::{read_account_activity,write_account_activity, read_quota_time_limit};
 use crate::storage_types::{TxEntry,  AccountActivityData, TxReleaseEntry, AccountQuotaReleaseData};
 

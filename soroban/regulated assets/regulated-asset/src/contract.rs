@@ -61,7 +61,7 @@ pub trait RegulatedAssetTrait {
         new_admin: Address,
     );
 
-    /// Sets whether the account is authorized to use its balance.
+    /// Sets whether the account is authorized to use its balance freely.
     /// If "authorized" is true, "id" should be able to use its balance.
     /// Emit event with topics = ["set_authorized", id: Address], data = [authorize: bool]
     fn set_authorized(
@@ -145,6 +145,7 @@ pub trait RegulatedAssetTrait {
     fn spendable_balance(env: Env, id: Address) -> i128;
 
     // Returns true if "id" is authorized to use its balance.
+    // By default, starts as true as account is not frozen.
     fn authorized(env: Env, id: Address) -> bool;
 
     /// Get the allowance for "spender" to transfer from "from".
@@ -167,7 +168,6 @@ pub trait RegulatedAssetTrait {
     // Get the symbol for this token.
     fn symbol(env: Env) -> String;
 
-    fn test(env:Env);
 
 }
 
@@ -337,11 +337,4 @@ impl RegulatedAssetTrait for RegulatedAsset {
         read_symbol(&e)
     }
 
-
-    fn test(e:Env){
-
-        let asset_controller = read_asset_controller(&e);
-        let asset_controller_client = asset_controller_contract::Client::new(&e, &asset_controller);      
-        return asset_controller_client.test();
-    }
 }

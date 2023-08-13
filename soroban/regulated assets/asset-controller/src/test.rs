@@ -23,16 +23,15 @@ fn advance_ledger(e: &Env, delta: u64) {
     });
 }
 
-fn initialize_use_cases<'a>() -> (Env, AssetControllerClient<'a>, asset_contract::Client<'a>, Address, Address, Address, Address, Address) {
+fn initialize_use_cases<'a>() -> (Env, AssetControllerClient<'a>, asset_contract::Client<'a>, Address, Address, Address, Address) {
     // INITIALIZATION
     let e = Env::default();
     e.mock_all_auths();
 
-    let mut admin = Address::random(&e);
-    let mut user_a = Address::random(&e);
-    let mut user_b = Address::random(&e);
-    let mut user_c = Address::random(&e);
-    let mut user_d = Address::random(&e);
+    let admin = Address::random(&e);
+    let user_a = Address::random(&e);
+    let user_b = Address::random(&e);
+    let user_c = Address::random(&e);
 
     // Deploys Asset Controller and Regulated Asset
     let asset_controler_id = e.register_contract(None, crate::AssetController {});
@@ -47,19 +46,25 @@ fn initialize_use_cases<'a>() -> (Env, AssetControllerClient<'a>, asset_contract
     let symbol = String::from_slice(&e, "Fifo");
 
     // Asset Controller Parameters
+    let probation_period: u64 = 60_000;
     let outflow_limit: i128 = 1000;
     let inflow_limit: i128 = 700;
     let quota_time_limit: u64 = 100;
 
     // Initializes AC and RA with crossed reference.
-    ac_client.initialize(&admin, &ra_client.address, &outflow_limit, &inflow_limit, &quota_time_limit);
+    ac_client.initialize(&admin, &ra_client.address, &probation_period, &quota_time_limit, &inflow_limit, &outflow_limit);
     ra_client.initialize(&admin, &decimal, &name, &symbol, &ac_client.address);
 
-    ra_client.mint(&user_a, &10000);
-    ra_client.mint(&user_b, &10000);
-    ra_client.mint(&user_c, &10000);
+    ra_client.mint(&user_a, &10_000);
+    ra_client.mint(&user_b, &10_000);
+    ra_client.mint(&user_c, &10_000);
 
     e.budget().reset_default();
+
+    // Needs to start higher than 0 due to the probation
+    // period, which considers 0 as not in probation
+    advance_ledger(&e, 1);
+
 
     (
         e,
@@ -69,7 +74,6 @@ fn initialize_use_cases<'a>() -> (Env, AssetControllerClient<'a>, asset_contract
         user_a,
         user_b,
         user_c,
-        user_d,
     )
 }
 
@@ -77,7 +81,7 @@ fn initialize_use_cases<'a>() -> (Env, AssetControllerClient<'a>, asset_contract
 #[test]
 fn test() {
 
-    let (e, ac_client, ra_client, admin, user_a, user_b, user_c, user_d) = initialize_use_cases();
+    let (e, ac_client, ra_client, admin, user_a, user_b, user_c) = initialize_use_cases();
 
 
     //
@@ -88,16 +92,14 @@ fn test() {
     assert_eq!(ac_client.get_outflow_limit(), 1000);
     assert_eq!(ac_client.get_inflow_limit(), 700);
     assert_eq!(ac_client.get_quota_time_limit(), 100);
+    assert_eq!(ac_client.get_probation_period(), 60_000); //1 month
     
 
     //
     // Validate quota history with a series of transactions within limits. 
-    //
-    ra_client.mint(&user_a, &10000);
-    ra_client.mint(&user_b, &10000);
-    ra_client.mint(&user_c, &10000);
-    e.budget().reset_default();
-    
+    //     
+    assert_eq!(ac_client.get_quota(&user_a), vec![&e,0,0]);
+    assert_eq!(ac_client.get_quota(&user_b), vec![&e,0,0]);
 
     // A->B 100
     ra_client.transfer(&user_a, &user_b, &100);
@@ -172,7 +174,7 @@ fn test() {
 fn quota_updated_through_time() {
 
    
-    let (e, ac_client, ra_client, admin, user_a, user_b, user_c, user_d) = initialize_use_cases();
+    let (e, ac_client, ra_client, admin, user_a, user_b, user_c) = initialize_use_cases();
 
     
     //
@@ -288,7 +290,7 @@ fn quota_updated_through_time() {
 #[test]
 fn quota_time_left() {
 
-    let (e, ac_client, ra_client, admin, user_a, user_b, user_c, user_d) = initialize_use_cases();
+    let (e, ac_client, ra_client, admin, user_a, user_b, user_c) = initialize_use_cases();
 
     
     //
@@ -614,5 +616,86 @@ fn quota_time_left() {
     //verify quota total
     assert_eq!(ac_client.get_quota(&user_a), vec![&e,0,0]);
     assert_eq!(ac_client.get_quota(&user_b), vec![&e,0,0]);
+
+}
+
+
+#[test]
+fn account_probation_period() {
+
+   
+    let (e, ac_client, ra_client, admin, user_a, user_b, user_c) = initialize_use_cases();
+
+    
+    //
+    // Test the initial probation period
+    // being default before any account activities
+    //
+    assert_eq!(ac_client.get_account_probation_period(&user_a), 60_000);
+    assert_eq!(ac_client.get_account_probation_period(&user_b), 60_000);
+    assert_eq!(ac_client.get_account_probation_period(&user_c), 60_000);
+    
+    advance_ledger(&e, 1_000);
+
+    assert_eq!(ac_client.get_account_probation_period(&user_a), 60_000);
+    assert_eq!(ac_client.get_account_probation_period(&user_b), 60_000);
+    assert_eq!(ac_client.get_account_probation_period(&user_c), 60_000);
+    
+    advance_ledger(&e, 500);
+
+    assert_eq!(ac_client.get_account_probation_period(&user_a), 60_000);
+    assert_eq!(ac_client.get_account_probation_period(&user_b), 60_000);
+    assert_eq!(ac_client.get_account_probation_period(&user_c), 60_000);
+    
+
+    //
+    // Test the probation perido being updated
+    // for accounts that had activity
+    //
+    // A->B 100
+    ra_client.transfer(&user_a, &user_b, &100);
+    e.budget().reset_default();
+
+    advance_ledger(&e, 10_000);
+    assert_eq!(ac_client.get_account_probation_period(&user_a), 50_000);
+    assert_eq!(ac_client.get_account_probation_period(&user_b), 50_000);
+    assert_eq!(ac_client.get_account_probation_period(&user_c), 60_000);
+
+
+    //
+    // Test the probation perido being updated
+    // for accounts that had further activity
+    //
+    // B->C 200
+    ra_client.transfer(&user_b, &user_c, &200);
+    
+
+    advance_ledger(&e, 5_000);
+    assert_eq!(ac_client.get_account_probation_period(&user_a), 45_000);
+    assert_eq!(ac_client.get_account_probation_period(&user_b), 45_000);
+    assert_eq!(ac_client.get_account_probation_period(&user_c), 55_000);
+
+
+
+    //
+    // Test the probation perido ending and 
+    // accounts being free to transact
+    //
+    advance_ledger(&e, 45_000);
+    assert_eq!(ac_client.get_account_probation_period(&user_a), 0);
+    assert_eq!(ac_client.get_account_probation_period(&user_b), 0);
+    assert_eq!(ac_client.get_account_probation_period(&user_c), 10_000);
+
+    ra_client.transfer(&user_a, &user_b, &2000);
+
+    advance_ledger(&e, 10_000);
+    assert_eq!(ac_client.get_account_probation_period(&user_a), 0);
+    assert_eq!(ac_client.get_account_probation_period(&user_b), 0);
+    assert_eq!(ac_client.get_account_probation_period(&user_c), 0);
+
+    ra_client.transfer(&user_b, &user_c, &2000);
+    e.budget().reset_default();
+
+
 
 }

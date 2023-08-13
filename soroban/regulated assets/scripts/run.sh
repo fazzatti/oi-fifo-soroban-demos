@@ -14,6 +14,10 @@ case "$ACTOR" in
     shift
     ./helpers/admin-actions.sh "$@"
     ;;
+  get)
+    shift
+    ./helpers/getters.sh "$@"
+    ;;
   *)
     echo "Error: Invalid Actor $ACTOR" >&2 # Print to stderr
     exit 1 # Exit the script

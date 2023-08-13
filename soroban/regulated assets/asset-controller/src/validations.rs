@@ -1,7 +1,15 @@
 
-use soroban_sdk::{contract, Address, Env};
+use soroban_sdk::Env;
 use crate::asset::read_asset;
+use crate::admin::has_administrator;
 
+
+pub fn is_contract_initialized(e:&Env){
+
+    if !has_administrator(&e) {
+        panic!("Contract hasn't been initialized yet!")
+    }
+}
 
 pub fn is_invoker_the_asset_contract(e:&Env){
     let call_stack = e.call_stack();
@@ -16,3 +24,5 @@ pub fn is_invoker_the_asset_contract(e:&Env){
         panic!("Asset controller was invoked directly.");
     }
 }
+
+

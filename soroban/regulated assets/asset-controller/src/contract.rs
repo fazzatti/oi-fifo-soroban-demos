@@ -1,17 +1,22 @@
 
 use soroban_sdk::{contract, contractimpl, Address, Env, Vec,vec};
-use crate::rules::{has_spender_achieved_outflow_limit, has_receiver_achieved_inflow_limit};
+use crate::rules::{has_spender_achieved_outflow_limit, has_receiver_achieved_inflow_limit, is_account_in_probation};
 use crate::asset::{write_asset,read_asset};
-use crate::data::{write_outflow_limit,write_inflow_limit, write_quota_time_limit, read_outflow_limit,read_inflow_limit,read_quota_time_limit};
+use crate::data::{write_outflow_limit,write_inflow_limit, write_quota_time_limit, read_outflow_limit,read_inflow_limit,read_quota_time_limit, read_probation_period, write_probation_period,read_account_probation_start};
 use crate::storage_types::AccountQuotaReleaseData;
 use crate::quota::{read_account_quota,record_transaction,get_account_quota_release};
 use crate::admin::{has_administrator,write_administrator,read_administrator};
-use crate::validations::is_invoker_the_asset_contract;
+use crate::validations::{is_invoker_the_asset_contract,is_contract_initialized};
 
+
+//
+// TODO: DIVIDE BUMP PER LEDGER (NOT IN SECONDS)
+//
+//
 
 pub trait AssetControllerTrait {
 
-    fn initialize(e: Env, asset: Address, admin: Address, outflow_limit: i128, inflow_limit: i128, quota_time_limit: u64 );
+    fn initialize(e: Env, admin: Address, asset: Address, probation_period:u64, quota_time_limit: u64, inflow_limit: i128, outflow_limit: i128 );
     
     
     // --------------------------------------------------------------------------------
@@ -28,45 +33,25 @@ pub trait AssetControllerTrait {
     fn review_transfer(env: Env, 
         from: Address,
         to: Address,
-        amount: i128,) -> bool;
+        amount: i128,) ;
     
-
-
-
-    // fn allow();
-
-    //Transfer from goin out
-    // fn preprocess_approved_outflow( env: soroban_sdk::Env,
-    //     spender: Address,
-    //     from: Address,
-    //     to: Address,
-    //     amount: i128,) -> bool;
-
-    // //Approve an account (allowance)
-    // fn approve(env: soroban_sdk::Env,
-    //     from: Address,
-    //     spender: Address,
-    //     amount: i128,
-    //     expiration_ledger: u32,);
-
-    // burn
-    // delegated burn
-    // 
-    // mint
-
-    // METHOD TO SET APPROVAL OF THE USER after probation
-
 
     // --------------------------------------------------------------------------------
     // Read-only
     // --------------------------------------------------------------------------------
     // The functions here don't need any authorization and don't emit any events.
 
+    fn get_probation_period(e:Env) -> u64;
+
     fn get_quota_time_limit(e:Env) -> u64;
 
     fn get_inflow_limit(e:Env) -> i128;
 
     fn get_outflow_limit(e:Env) -> i128;
+
+    // returns the time left in probation in seconds.
+    // if probation has finished, returns 0.
+    fn get_account_probation_period(e:Env,id:Address) -> u64;
 
     fn get_asset(e:Env) -> Address;
 
@@ -77,6 +62,9 @@ pub trait AssetControllerTrait {
     // as this: [<consumed inflow quota>, <consumed outlow quota>]
     fn get_quota(e:Env, id: Address) -> Vec<i128>;
 
+    // returns the current time left for each
+    // recorded transaction in the quota for an account
+    // as type AccountQuotaReleaseData
     fn get_quota_release_time(e:Env, id: Address) -> AccountQuotaReleaseData;
 
 }
@@ -90,32 +78,40 @@ pub struct AssetController;
 #[contractimpl]
 impl AssetControllerTrait for AssetController {
 
-    fn initialize(e: Env, admin: Address, asset: Address, outflow_limit: i128, inflow_limit: i128 , quota_time_limit: u64) {
+    fn initialize(e: Env, admin: Address, asset: Address, probation_period:u64, quota_time_limit: u64, inflow_limit: i128, outflow_limit: i128) {
         if has_administrator(&e) {
             panic!("Already initialized!")
         }
         write_administrator(&e, &admin);
         write_asset(&e, &asset);
 
-        write_outflow_limit(&e,outflow_limit);
-        write_inflow_limit(&e,inflow_limit);
+        write_probation_period(&e,probation_period);
         write_quota_time_limit(&e,quota_time_limit);
+        write_inflow_limit(&e,inflow_limit);
+        write_outflow_limit(&e,outflow_limit);
+        
       
     }
 
     fn review_transfer(e: Env, 
         from: Address,
         to: Address,
-        amount: i128,) -> bool  {
+        amount: i128,)  {
 
+        // Check if invokation is valid
+        is_contract_initialized(&e); 
         is_invoker_the_asset_contract(&e);    
-        has_spender_achieved_outflow_limit(&e, &from, amount);
-        has_receiver_achieved_inflow_limit(&e, &to, amount);
 
-        record_transaction(&e, from, amount, true);
-        record_transaction(&e, to, amount, false);
-        
-        return true;
+        // Validate controller rules
+        if is_account_in_probation(&e, &from) {
+            has_spender_achieved_outflow_limit(&e, &from, amount);
+            record_transaction(&e, from, amount, true);
+        }
+
+        if is_account_in_probation(&e, &to) {
+            has_receiver_achieved_inflow_limit(&e, &to, amount);
+            record_transaction(&e, to, amount, false);
+        }
     }
 
 
@@ -128,11 +124,32 @@ impl AssetControllerTrait for AssetController {
 
     }
 
+    fn get_account_probation_period(e:Env,id:Address) -> u64{
+        
+        // Check if invokation is valid
+        is_contract_initialized(&e); 
+
+        let account_probation_start = read_account_probation_start(&e, &id);
+
+        if account_probation_start > 0 {
+            let probation_period = read_probation_period(&e);
+            probation_period.saturating_sub(e.ledger().timestamp() - account_probation_start)
+        }
+        else{
+            account_probation_start
+        }
+        
+    }
+
     fn get_quota_release_time(e:Env, id: Address) -> AccountQuotaReleaseData {
 
         get_account_quota_release(&e,&id)
     }
     
+    fn get_probation_period(e:Env) -> u64{
+        read_probation_period(&e)
+    }
+
     fn get_quota_time_limit(e:Env) -> u64{
         read_quota_time_limit(&e)
     }

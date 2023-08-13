@@ -6,44 +6,6 @@
 # 
 #
 
-get_user_pk(){
-    user=$1
-    case "$user" in
-    a)
-        echo ${USER_A_PK}
-        ;;
-    b)
-        echo ${USER_B_PK}
-        ;;
-    c)
-        echo ${USER_C_PK}
-        ;;
-    *)
-        echo "Error: Invalid user $user" >&2 # Print to stderr
-        exit 1 # Exit the script
-        ;;
-    esac
-}
-
-get_user_sk(){
-    user=$1
-    case "$user" in
-    a)
-        echo ${USER_A_SK}
-        ;;
-    b)
-        echo ${USER_B_SK}
-        ;;
-    c)
-        echo ${USER_C_SK}
-        ;;
-    *)
-        echo "Error: Invalid user $user" >&2 # Print to stderr
-        exit 1 # Exit the script
-        ;;
-    esac
-}
-
 CONTRACT_ID=""
 INVOKER_SK=""
 FUNCTION_NAME=""
@@ -56,19 +18,25 @@ case "$FUNCTION" in
     INVOKER_SK=${RA_ADMIN_SK}
     CONTRACT_ID=${RA_CONTRACT_ID}
     FUNCTION_NAME="mint"
-    ARGS="--to $(get_user_pk $2) --amount $3"
+    ARGS="--to $(./helpers/get-account.sh $2 pk) --amount $3"
     ;;
   quota)
     INVOKER_SK=${AC_ADMIN_SK}
     CONTRACT_ID=${AC_CONTRACT_ID}
     FUNCTION_NAME="get_quota"
-    ARGS="--id $(get_user_pk $2)"
+    ARGS="--id $(./helpers/get-account.sh $2 pk)"
     ;;
-  test)
-    INVOKER_SK=${AC_ADMIN_SK}
-    CONTRACT_ID=${AC_CONTRACT_ID}
-    FUNCTION_NAME="test"
-    ARGS=""
+  authorize)
+    INVOKER_SK=${RA_ADMIN_SK}
+    CONTRACT_ID=${RA_CONTRACT_ID}
+    FUNCTION_NAME="set_authorized"
+    ARGS="--id $(./helpers/get-account.sh $2 pk) --authorize"
+    ;;
+  unauthorize)
+    INVOKER_SK=${RA_ADMIN_SK}
+    CONTRACT_ID=${RA_CONTRACT_ID}
+    FUNCTION_NAME="set_authorized"
+    ARGS="--id $(./helpers/get-account.sh $2 pk)"
     ;;
   *)
     echo "Error: Invalid function $FUNCTION" >&2 # Print to stderr

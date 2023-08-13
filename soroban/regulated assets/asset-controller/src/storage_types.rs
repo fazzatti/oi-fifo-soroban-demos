@@ -1,16 +1,21 @@
 use soroban_sdk::{contracttype, Address, Vec};
 
-#[derive(Clone)]
-#[contracttype]
-pub struct AffiliationDataKey {
-    pub primary: Address,
-    pub secondary: Address,
-}
+pub(crate) const INSTANCE_BUMP_AMOUNT: u32 = 518400; // 30 days
 
-pub struct AffiliationValue {
-    pub inflow: i128,
-    pub outflow: i128,
-}
+
+
+//TODO: Affilition between accounts validation
+// #[derive(Clone)]
+// #[contracttype]
+// pub struct AffiliationDataKey {
+//     pub primary: Address,
+//     pub secondary: Address,
+// }
+
+// pub struct AffiliationValue {
+//     pub inflow: i128,
+//     pub outflow: i128,
+// }
 
 #[derive(Clone)]
 #[contracttype]
@@ -57,11 +62,13 @@ pub struct TxReleaseEntry{
 #[derive(Clone)]
 #[contracttype]
 pub enum DataKey {
-    Affiliation(AffiliationDataKey),
-    Admin,         
-    Asset,                
-    AccountActivity(Address),
-    OutflowLimit,
-    InflowLimit,
-    QuotaTimeLimit,                  //u64
+    // Affiliation(AffiliationDataKey), //AffiliationValue
+    Admin,                              //Address
+    Asset,                              //Address
+    AccountActivity(Address),           //AccountActivityData
+    OutflowLimit,                       //i128
+    InflowLimit,                        //i128
+    QuotaTimeLimit,                     //u64
+    ProbationPeriod,                    //u64
+    AccountProbationStart(Address),     //u64
 }
