@@ -3,8 +3,8 @@
 A collection of various use cases implemented on Stellar's smart contract platform, Soroban.
 
 <div align="center" style="display: flex; justify-content: space-between; align-items: center;">
-  <img src="assets/logo_oififo.png" alt="Oi Fifo Logo" style="width: 50px; align-self: center; margin-right: 50px;" />
-  <img src="https://soroban.stellar.org/img/soroban-wordmark-temp.svg" alt="Soroban" style="width: 200px; align-self: center;" />
+  <img src="assets/logo_oififo.png" alt="Oi Fifo Logo" style="width: 100px; align-self: center; margin-right: 50px;" />
+  <img src="https://soroban.stellar.org/img/soroban-wordmark-temp.svg" alt="Soroban" style="width: 250px; align-self: center;" />
 </div>
 
 
