@@ -1,5 +1,12 @@
 # Oi Fifo - Stellar Soroban Use Cases
+<table align="center" border="0">
+<tr>
+<td><img src="assets/logo_oififo.png" alt="Oi Fifo Logo" width="150"/></td>
+<td><img src="https://soroban.stellar.org/img/soroban-wordmark-temp.svg" alt="Soroban" width="250"/></td>
+</tr>
+</table>
 
+<<<<<<< HEAD
 A collection of various use cases implemented on Stellar's smart contract platform, Soroban.
 
 <div style="display: flex; align-items: center; justify-content: space-between;">
@@ -8,6 +15,9 @@ A collection of various use cases implemented on Stellar's smart contract platfo
 </div>
 
 
+=======
+A collection of use cases implemented on Stellar's smart contract platform, Soroban.
+>>>>>>> 41483b3b2ea9b6d5f09b09b8df8ecc7e099b7112
 
 ## Use Cases
 
