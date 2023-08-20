@@ -3,7 +3,7 @@
 A collection of various use cases implemented on Stellar's smart contract platform, Soroban.
 
 <div style="display: flex; align-items: center; justify-content: space-between;">
-  <img src="assets/logo_oififo.png" alt="Oi Fifo Logo" width="100" /> <!-- Adjust width as needed -->
+  <img src="assets/logo_oififo.png" alt="Oi Fifo Logo" width="100" />
   <img src="https://soroban.stellar.org/img/soroban-wordmark-temp.svg" alt="Soroban" width="250" />
 </div>
 
