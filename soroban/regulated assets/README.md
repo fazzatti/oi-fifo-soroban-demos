@@ -3,6 +3,8 @@
 ## Use Case
 Regulated Assets are those that mandate the issuer's (or an authorized third party’s, such as a licensed securities exchange) approval for every transaction. Certain regulations require asset issuers to monitor and approve every transaction involving their assets, ensuring specific constraints are met. The Stellar ecosystem, as defined in [SEP08 - Regulated Assets](https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0008.md), offers an approach that capitalizes on Stellar Classic's capabilities. Drawing inspiration from SEP08 standards, this use case enriches a token contract with an auxiliary asset controller contract, allowing the asset issuer to enforce tailored rules programmatically.
 
+The hosted demo can be accessed at: [oififo.com/demos/regulated-asset](https://www.oififo.com/demos/regulated-asset)
+
 ### The Challenge
 SEP08 provides an effective method for creating an Approval Server that evaluates client transactions based on the server's predefined approval criteria. However, these rules operate outside the blockchain. This external operation adds complexity and diminishes transparency for the end user, as the server's code executes off-chain. The advent of Stellar's smart contract platform, Soroban, now offers the opportunity to migrate some of these rules on-chain, ensuring programmable and transparent operations.
 
