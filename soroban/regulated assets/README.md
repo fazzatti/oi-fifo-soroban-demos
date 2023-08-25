@@ -1,11 +1,15 @@
 # Regulated Asset dApp demo
 
 ## Use Case
+
 Regulated Assets are those that mandate the issuer's (or an authorized third party’s, such as a licensed securities exchange) approval for every transaction. Certain regulations require asset issuers to monitor and approve every transaction involving their assets, ensuring specific constraints are met. The Stellar ecosystem, as defined in [SEP08 - Regulated Assets](https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0008.md), offers an approach that capitalizes on Stellar Classic's capabilities. Drawing inspiration from SEP08 standards, this use case enriches a token contract with an auxiliary asset controller contract, allowing the asset issuer to enforce tailored rules programmatically.
+
+[![Check out the Use Case Video explanation](../../assets/regulated-asset/thumb-use-case.png)](<[link_to_video](https://youtu.be/rec_DnkkJ-A?si=UniAZ9VFVTv6ckGO)>)
 
 The hosted demo can be accessed at: [oififo.com/demos/regulated-asset](https://www.oififo.com/demos/regulated-asset)
 
 ### The Challenge
+
 SEP08 provides an effective method for creating an Approval Server that evaluates client transactions based on the server's predefined approval criteria. However, these rules operate outside the blockchain. This external operation adds complexity and diminishes transparency for the end user, as the server's code executes off-chain. The advent of Stellar's smart contract platform, Soroban, now offers the opportunity to migrate some of these rules on-chain, ensuring programmable and transparent operations.
 
 Some of the key benefits are:
@@ -18,8 +22,9 @@ Some of the key benefits are:
 
 - **Automated Compliance**: By moving rules and regulations on-chain, compliance can be automated, reducing manual intervention and the potential for errors.
 
-
 ### Features
+
+[![Check out the code overview video](../../assets/regulated-asset/thumb-code-overview.png)](<[link_to_video](https://youtu.be/T4_Ift9NsQA?si=CLeELlyYhAHw0yBg)>)
 
 The current version of this use case showcases several core features, highlighting how Soroban's programmable capabilities can incorporate a range of functionalities into the token.
 
@@ -27,9 +32,9 @@ The current version of this use case showcases several core features, highlighti
 
 - **Outflow Quota**: During probation, there's a restriction on the amount an account can send. It must remain below the outflow limit determined by the asset's administrator. This quota resets periodically based on the asset's predefined time span. For instance, if the outflow quota is set at '100' and the reset period at '24h', it implies that an account can dispatch up to 100 units of the asset every 24 hours. Every transaction deducts from the quota, and once depleted, the user must wait for quota renewal before initiating further transactions.
 
-- **Inflow Quota**: Analogous to the outflow quota, during probation, there's a cap on the amount an account can receive, defined by the asset administrator. This quota too resets after the asset-specific time period. 
-> **Important** Both inflow and outflow quotas are managed separatelly.
+- **Inflow Quota**: Analogous to the outflow quota, during probation, there's a cap on the amount an account can receive, defined by the asset administrator. This quota too resets after the asset-specific time period.
 
+  > **Important** Both inflow and outflow quotas are managed separatelly.
 
 - **Affiliation(Upcoming)**: This feature, currently under development, aims to establish specific limits for bi-directional interactions between two accounts.
 
@@ -42,7 +47,9 @@ Follow the steps below to deploy and interact with the Regulated Asset dApp:
 1. `soroban-cli v0.9.4`. See https://soroban.stellar.org/docs/getting-started/setup#install-the-soroban-cli
 
 ## Compile Contracts
+
 This project is composed of two contracts:
+
 - Regulated Asset: A Soroban token implementation with added capabilities to interact with the asset controller.
 - Asset Controller: A Rule-enforcing contract tha defines the constratins to be followed by the asset users.
 
@@ -63,11 +70,13 @@ One can use the `run.sh` helper script to execute the different contract functio
 For further details on how to configure and use the helper scripts, refer to [./scripts/README](scripts/README.md).
 
 1. The user a send user b 1000 units of the asset.
+
    ```bash
    ./run.sh a transfer b 100
    ```
 
 2. User a verifies its quota.
+
    ```bash
    ./run.sh get ac quota a
    ```
