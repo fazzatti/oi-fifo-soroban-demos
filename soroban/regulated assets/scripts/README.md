@@ -2,7 +2,11 @@
 
 This guide provides details on how to use the scripts under the `./scripts` folder to interact with the Regulated Asset and the Asset Controller contracts.
 
-[![Check out the Scripts Video](../../../assets/regulated-asset/thumb-scripts.png)](<[link_to_video](https://youtu.be/vN9thvfEdb0?si=ECqraRSYdcSQJDXi)>)
+<div align="center">
+    <a href="https://youtu.be/vN9thvfEdb0?si=ECqraRSYdcSQJDXi">
+        <img src="../../../assets/regulated-asset/thumb-scripts.png" width="450" alt="Check out the Scripts Video">
+    </a>
+</div>
 
 ## Deploy on Futurenet
 
