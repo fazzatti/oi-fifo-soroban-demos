@@ -4,7 +4,13 @@
 
 Regulated Assets are those that mandate the issuer's (or an authorized third party’s, such as a licensed securities exchange) approval for every transaction. Certain regulations require asset issuers to monitor and approve every transaction involving their assets, ensuring specific constraints are met. The Stellar ecosystem, as defined in [SEP08 - Regulated Assets](https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0008.md), offers an approach that capitalizes on Stellar Classic's capabilities. Drawing inspiration from SEP08 standards, this use case enriches a token contract with an auxiliary asset controller contract, allowing the asset issuer to enforce tailored rules programmatically.
 
-[![Check out the Use Case Video explanation](../../assets/regulated-asset/thumb-use-case.png)](<[link_to_video](https://youtu.be/rec_DnkkJ-A?si=UniAZ9VFVTv6ckGO)>)
+<div align="center">
+    <a href="https://youtu.be/rec_DnkkJ-A?si=UniAZ9VFVTv6ckGO">
+        <img src="../../assets/regulated-asset/thumb-use-case.png" width="450" alt="Check out the Use Case Video explanation">
+    </a>
+</div>
+
+
 
 The hosted demo can be accessed at: [oififo.com/demos/regulated-asset](https://www.oififo.com/demos/regulated-asset)
 
@@ -24,9 +30,13 @@ Some of the key benefits are:
 
 ### Features
 
-[![Check out the code overview video](../../assets/regulated-asset/thumb-code-overview.png)](<[link_to_video](https://youtu.be/T4_Ift9NsQA?si=CLeELlyYhAHw0yBg)>)
-
 The current version of this use case showcases several core features, highlighting how Soroban's programmable capabilities can incorporate a range of functionalities into the token.
+
+<div align="center">
+    <a href="https://youtu.be/T4_Ift9NsQA?si=CLeELlyYhAHw0yBg">
+        <img src="../../assets/regulated-asset/thumb-code-overview.png" width="450" alt="Check out the code overview video">
+    </a>
+</div>
 
 - **Probation Period**: On a user's initial interaction with the regulated asset, either as a sender or a receiver, a probation period begins. This period lasts for a default duration set by the asset issuer. Throughout this period, the asset controller's rules apply to this account. Once the probation ends, the user can engage with the asset as with any standard Soroban token.
 
