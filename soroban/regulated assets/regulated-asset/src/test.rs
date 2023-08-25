@@ -83,7 +83,7 @@ fn initialize_use_cases<'a>() -> (
 
 #[test]
 fn test() {
-    let (e, ra_client, _ac_client, _admin, user_a, user_b, _user_c) = initialize_use_cases();
+    let (_e, ra_client, _ac_client, _admin, user_a, user_b, _user_c) = initialize_use_cases();
 
     ra_client.mint(&user_a, &1000);
     assert_eq!(ra_client.balance(&user_a), 1000);
