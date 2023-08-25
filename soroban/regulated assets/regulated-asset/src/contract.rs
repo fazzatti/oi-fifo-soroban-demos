@@ -1,6 +1,5 @@
 
-// use {contract, contractimpl, Address, Env, token};
-// use crate::storage_types::DataKey;
+
 use crate::admin::{has_administrator, read_administrator, write_administrator};
 use crate::asset_control::{write_asset_controller, read_asset_controller};
 use crate::allowance::{read_allowance, spend_allowance, write_allowance};
@@ -12,10 +11,6 @@ use crate::metadata::{read_decimal, read_name, read_symbol, write_metadata};
 use crate::storage_types::INSTANCE_BUMP_AMOUNT;
 use soroban_sdk::{contract, contractimpl, Address, Env, String};
 use soroban_token_sdk::TokenMetadata;
-
-//../../asset_controller/target/wasm32-unknown-unknown/release/asset_controller.wasm
-
-
 
 
 mod asset_controller_contract { 
@@ -238,7 +233,7 @@ impl RegulatedAssetTrait for RegulatedAsset {
 
         let asset_controller = read_asset_controller(&e);
         let asset_controller_client = asset_controller_contract::Client::new(&e, &asset_controller);
-        
+
         asset_controller_client.review_transfer(&from,&to, &amount);
 
 

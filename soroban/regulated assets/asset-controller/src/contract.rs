@@ -105,7 +105,7 @@ impl AssetControllerTrait for AssetController {
     }
 
     fn review_transfer(e: Env, from: Address, to: Address, amount: i128) {
-        // Check if invokation is valid
+        // Check if the invoke is valid
         is_contract_initialized(&e);
         is_invoker_the_asset_contract(&e);
 
