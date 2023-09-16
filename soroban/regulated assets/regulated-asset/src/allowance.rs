@@ -42,7 +42,7 @@ pub fn write_allowance(
     if amount > 0 {
         e.storage().temporary().bump(
             &key,
-            expiration_ledger
+            expiration_ledger,expiration_ledger
                 .checked_sub(e.ledger().sequence())
                 .unwrap(),
         )
