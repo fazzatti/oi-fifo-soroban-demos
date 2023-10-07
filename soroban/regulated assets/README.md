@@ -10,8 +10,6 @@ Regulated Assets are those that mandate the issuer's (or an authorized third par
     </a>
 </div>
 
-
-
 The hosted demo can be accessed at: [oififo.com/demos/regulated-asset](https://www.oififo.com/demos/regulated-asset)
 
 ### The Challenge
@@ -66,10 +64,11 @@ This project is composed of two contracts:
 1. In access the `asset-controller` directory, run the command `soroban contract build`. This will compile the Asset Controller contract and generate the wasm files.
 2. In access the `regulated-asset` directory, run the command `soroban contract build`. This will compile the Asset Controller contract and generate the wasm files.
 
-## Deploy on Futurenet
+## Deploy on Futurenet / Testnet
 
 1. Access the folder `/scripts`. There you'll find a collection of helpers scripts to deploy and test this contract.
-2. Set the parameters under `config.sh`. By default, they come set for futurenet with dummy accounts and assets.
+2. Set the parameters under `config.sh`. By default, they come set for testnet with dummy accounts and assets.
+   If this is your first time deploying on testnet, refer to the [Deploy on Testnet](https://soroban.stellar.org/docs/getting-started/deploy-to-testnet) article as you might need to configure your CLI with the testnet parameters.
 3. Run `init.sh all` to deploy and initialize both contracts according to the defined parameters.
 
 For further details on how to configure and use the helper scripts, refer to [./scripts/README](scripts/README.md).

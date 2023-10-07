@@ -8,10 +8,11 @@ This guide provides details on how to use the scripts under the `./scripts` fold
     </a>
 </div>
 
-## Deploy on Futurenet
+## Deploy on Futurenet / Testnet
 
 1. Access the folder `/scripts`. There you'll find a collection of helpers scripts to deploy and test this contract.
-2. Set the parameters under `config.sh`. By default, they come set for futurenet with dummy accounts and assets.
+2. Set the parameters under `config.sh`. By default, they come set for testnet with dummy accounts and assets.
+   If this is your first time deploying on testnet, refer to the [Deploy on Testnet](https://soroban.stellar.org/docs/getting-started/deploy-to-testnet) article as you might need to configure your CLI with the testnet parameters.
 3. Run `init.sh all` to deploy and initialize both contracts according to the defined parameters.
 
 For further details on how to configure and use the helper scripts, refer to [./scripts/README](scripts/README.md).

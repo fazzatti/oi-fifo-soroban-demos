@@ -1,5 +1,5 @@
 # Environment Variables
-export NETWORK_NAME="futurenet" # Name of the Stellar network to deploy the contract (e.g., public, testnet, futurenet)
+export NETWORK_NAME="testnet" # Name of the Stellar network to deploy the contract (e.g., public, testnet, futurenet)
 export DATA_DIR="./data"
 
 #Accounts
