@@ -15,7 +15,7 @@ use crate::validations::{is_contract_initialized, is_invoker_the_asset_contract}
 use soroban_sdk::{contract, contractimpl, vec, Address, Env, Vec};
 
 pub trait AssetControllerTrait {
-    // Inititalize Parameter
+    // Inititalize Parameters
     //--------------------------------------------------------------------------------
     // admin:            Address that has managing rights over the contract
     // asset:            Address of the regulated asset contract
