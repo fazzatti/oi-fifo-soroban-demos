@@ -1,6 +1,6 @@
 [workspace]
-members = ["soroban/regulated assets/*"]
-exclude = ["soroban/regulated assets/scripts/"]
+members = ["soroban/regulated assets/*","soroban/regulated classic asset/*"]
+exclude = ["soroban/regulated assets/scripts/", "soroban/regulated classic asset/scripts/"]
 resolver = "2"
 
 [workspace.dependencies]
