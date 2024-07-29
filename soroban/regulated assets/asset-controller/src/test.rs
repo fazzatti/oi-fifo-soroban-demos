@@ -33,10 +33,10 @@ fn initialize_use_cases<'a>() -> (
     let e = Env::default();
     e.mock_all_auths();
 
-    let admin = Address::random(&e);
-    let user_a = Address::random(&e);
-    let user_b = Address::random(&e);
-    let user_c = Address::random(&e);
+    let admin = Address::generate(&e);
+    let user_a = Address::generate(&e);
+    let user_b = Address::generate(&e);
+    let user_c = Address::generate(&e);
 
     // Deploys Asset Controller and Regulated Asset
     let asset_controler_id = e.register_contract(None, crate::AssetController {});
