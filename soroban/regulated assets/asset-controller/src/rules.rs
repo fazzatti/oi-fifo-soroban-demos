@@ -26,7 +26,7 @@ pub fn has_receiver_achieved_inflow_limit(e: &Env, receiver: &Address, amount: i
 
 //
 // On the account's first interaction with the asset,
-// we start its probation period.Once complete, we set
+// we start its probation period. Once complete, we set
 // its start time to '0', removing any further limits.
 //
 pub fn is_account_in_probation(e: &Env, id: &Address) -> bool {
