@@ -25,7 +25,7 @@ fn test() {
     let e = Env::default();
     e.mock_all_auths();
 
-    let admin_address = Address::random(&e);
+    let admin_address = Address::generate(&e);
 
     // Register the classic asset
     let classic_asset_address = e.register_stellar_asset_contract(admin_address.clone());
@@ -35,7 +35,7 @@ fn test() {
     // asset_admin_client.env.
 
     //register the asset controller
-    let asset_controler_address = Address::random(&e);
+    let asset_controler_address = Address::generate(&e);
 
     //register the wrapper interface
     let wrapper_interface_contract_id = e.register_contract(None, crate::WrapperInterface {});
@@ -55,14 +55,14 @@ fn test() {
 
     // Change admin through Wrapper Interface
     assert_eq!(wi_client.get_admin(), admin_address);
-    let new_admin = Address::random(&e);
+    let new_admin = Address::generate(&e);
     wi_client.set_admin(&new_admin);
     assert_eq!(wi_client.get_admin(), new_admin);
     wi_client.set_admin(&admin_address);
     assert_eq!(wi_client.get_admin(), admin_address);
 
     // Mint to random user through the Wrapper
-    let user_a = Address::random(&e);
+    let user_a = Address::generate(&e);
     // asset_admin_client.set_authorized(&user_a, &false); // simulating an unauthorized trustline
     wi_client.mint(&user_a, &100);
     assert_eq!(asset_client.balance(&user_a), 100);
