@@ -5,7 +5,7 @@ use crate::contract::RegulatedAssetClient;
 
 // use crate::{contract::Token, TokenClient};
 use soroban_sdk::{
-    testutils::{Address as _, Ledger},
+    testutils::{Address as TestAddress, Ledger},
     Address, Env, String,
 };
 
@@ -34,10 +34,10 @@ fn initialize_use_cases<'a>() -> (
     let e = Env::default();
     e.mock_all_auths();
 
-    let admin = Address::random(&e);
-    let user_a = Address::random(&e);
-    let user_b = Address::random(&e);
-    let user_c = Address::random(&e);
+    let admin = Address::generate(&e);
+    let user_a = Address::generate(&e);
+    let user_b = Address::generate(&e);
+    let user_c = Address::generate(&e);
 
     // Deploys Asset Controller and Regulated Asset
     let asset_controler_id = e.register_contract_wasm(None, asset_controller_contract::WASM);
@@ -48,8 +48,8 @@ fn initialize_use_cases<'a>() -> (
 
     // Regulated Asset Parameters
     let decimal: u32 = 7;
-    let name = String::from_slice(&e, "Fifocoin");
-    let symbol = String::from_slice(&e, "Fifo");
+    let name = String::from_str(&e, "Fifocoin");
+    let symbol = String::from_str(&e, "Fifo");
 
     // Asset Controller Parameters
     let probation_period: u64 = 60_000;

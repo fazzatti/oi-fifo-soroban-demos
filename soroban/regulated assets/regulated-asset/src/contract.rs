@@ -1,30 +1,31 @@
-
-
 use crate::admin::{has_administrator, read_administrator, write_administrator};
-use crate::asset_control::{write_asset_controller, read_asset_controller};
 use crate::allowance::{read_allowance, spend_allowance, write_allowance};
+use crate::asset_control::{read_asset_controller, write_asset_controller};
 use crate::balance::{is_authorized, write_authorization};
 use crate::balance::{read_balance, receive_balance, spend_balance};
 use crate::event;
-use crate::validations::check_nonnegative_amount;
 use crate::metadata::{read_decimal, read_name, read_symbol, write_metadata};
-use crate::storage_types::{INSTANCE_BUMP_AMOUNT,INSTANCE_BUMP_THREASHOLD};
-use soroban_sdk::{contract, contractimpl, Address, Env, String};
+use crate::storage_types::{INSTANCE_BUMP_AMOUNT, INSTANCE_BUMP_THREASHOLD};
+use crate::validations::check_nonnegative_amount;
+use soroban_sdk::auth::{ContractContext, InvokerContractAuthEntry, SubContractInvocation};
+use soroban_sdk::{contract, contractimpl, vec, Address, Env, IntoVal, String, Symbol, Val, Vec};
 use soroban_token_sdk::metadata::TokenMetadata;
 
-
-mod asset_controller_contract { 
-    soroban_sdk::contractimport!( 
+mod asset_controller_contract {
+    soroban_sdk::contractimport!(
         file = "../../../target/wasm32-unknown-unknown/release/asset_controller.wasm"
     );
 }
 
-
-    
 pub trait RegulatedAssetTrait {
-
-
-    fn initialize(e: Env, admin: Address, decimal: u32, name: String, symbol: String, asset_controller: Address);
+    fn initialize(
+        e: Env,
+        admin: Address,
+        decimal: u32,
+        name: String,
+        symbol: String,
+        asset_controller: Address,
+    );
 
     // --------------------------------------------------------------------------------
     // Admin interface – privileged functions.
@@ -35,35 +36,20 @@ pub trait RegulatedAssetTrait {
 
     /// Clawback "amount" from "from" account. "amount" is burned.
     /// Emit event with topics = ["clawback", admin: Address, to: Address], data = [amount: i128]
-    fn clawback(
-        env: Env,
-        from: Address,
-        amount: i128,
-    );
+    fn clawback(env: Env, from: Address, amount: i128);
 
     /// Mints "amount" to "to".
     /// Emit event with topics = ["mint", admin: Address, to: Address], data = [amount: i128]
-    fn mint(
-        env: Env,
-        to: Address,
-        amount: i128,
-    );
+    fn mint(env: Env, to: Address, amount: i128);
 
     /// Sets the administrator to the specified address "new_admin".
     /// Emit event with topics = ["set_admin", admin: Address], data = [new_admin: Address]
-    fn set_admin(
-        env: Env,
-        new_admin: Address,
-    );
+    fn set_admin(env: Env, new_admin: Address);
 
     /// Sets whether the account is authorized to use its balance freely.
     /// If "authorized" is true, "id" should be able to use its balance.
     /// Emit event with topics = ["set_authorized", id: Address], data = [authorize: bool]
-    fn set_authorized(
-        env: Env,
-        id: Address,
-        authorized: bool,
-    );
+    fn set_authorized(env: Env, id: Address, authorized: bool);
 
     // --------------------------------------------------------------------------------
     // Token interface
@@ -79,50 +65,24 @@ pub trait RegulatedAssetTrait {
     /// An expired entry (where "expiration_ledger" < the current ledger number)
     /// should be treated as a 0 amount allowance.
     /// Emit event with topics = ["approve", from: Address, spender: Address], data = [amount: i128, expiration_ledger: u32]
-    fn approve(
-        env: Env,
-        from: Address,
-        spender: Address,
-        amount: i128,
-        expiration_ledger: u32,
-    );
+    fn approve(env: Env, from: Address, spender: Address, amount: i128, expiration_ledger: u32);
 
     /// Transfer "amount" from "from" to "to".
     /// Emit event with topics = ["transfer", from: Address, to: Address], data = [amount: i128]
-    fn transfer(
-        env: Env,
-        from: Address,
-        to: Address,
-        amount: i128,
-    );
+    fn transfer(env: Env, from: Address, to: Address, amount: i128);
 
     /// Transfer "amount" from "from" to "to", consuming the allowance of "spender".
     /// Authorized by spender (`spender.require_auth()`).
     /// Emit event with topics = ["transfer", from: Address, to: Address], data = [amount: i128]
-    fn transfer_from(
-        env: Env,
-        spender: Address,
-        from: Address,
-        to: Address,
-        amount: i128,
-    );
+    fn transfer_from(env: Env, spender: Address, from: Address, to: Address, amount: i128);
 
     /// Burn "amount" from "from".
     /// Emit event with topics = ["burn", from: Address], data = [amount: i128]
-    fn burn(
-        env: Env,
-        from: Address,
-        amount: i128,
-    );
+    fn burn(env: Env, from: Address, amount: i128);
 
     /// Burn "amount" from "from", consuming the allowance of "spender".
     /// Emit event with topics = ["burn", from: Address], data = [amount: i128]
-    fn burn_from(
-        env: Env,
-        spender: Address,
-        from: Address,
-        amount: i128,
-    );
+    fn burn_from(env: Env, spender: Address, from: Address, amount: i128);
 
     // --------------------------------------------------------------------------------
     // Read-only Token interface
@@ -144,11 +104,7 @@ pub trait RegulatedAssetTrait {
     fn authorized(env: Env, id: Address) -> bool;
 
     /// Get the allowance for "spender" to transfer from "from".
-    fn allowance(
-        env: Env,
-        from: Address,
-        spender: Address,
-    ) -> i128;
+    fn allowance(env: Env, from: Address, spender: Address) -> i128;
 
     // --------------------------------------------------------------------------------
     // Descriptive Interface
@@ -162,19 +118,21 @@ pub trait RegulatedAssetTrait {
 
     // Get the symbol for this token.
     fn symbol(env: Env) -> String;
-
-
 }
-
 
 #[contract]
 pub struct RegulatedAsset;
 
 #[contractimpl]
 impl RegulatedAssetTrait for RegulatedAsset {
-    
-    
-    fn initialize(e: Env, admin: Address, decimal: u32, name: String, symbol: String, asset_controller: Address) {
+    fn initialize(
+        e: Env,
+        admin: Address,
+        decimal: u32,
+        name: String,
+        symbol: String,
+        asset_controller: Address,
+    ) {
         if has_administrator(&e) {
             panic!("already initialized")
         }
@@ -196,7 +154,9 @@ impl RegulatedAssetTrait for RegulatedAsset {
     }
 
     fn allowance(e: Env, from: Address, spender: Address) -> i128 {
-        e.storage().instance().bump(INSTANCE_BUMP_THREASHOLD,INSTANCE_BUMP_AMOUNT);
+        e.storage()
+            .instance()
+            .extend_ttl(INSTANCE_BUMP_THREASHOLD, INSTANCE_BUMP_AMOUNT);
         read_allowance(&e, from, spender).amount
     }
 
@@ -205,37 +165,64 @@ impl RegulatedAssetTrait for RegulatedAsset {
 
         check_nonnegative_amount(amount);
 
-        e.storage().instance().bump(INSTANCE_BUMP_THREASHOLD,INSTANCE_BUMP_AMOUNT);
+        e.storage()
+            .instance()
+            .extend_ttl(INSTANCE_BUMP_THREASHOLD, INSTANCE_BUMP_AMOUNT);
 
         write_allowance(&e, from.clone(), spender.clone(), amount, expiration_ledger);
         event::approve(&e, from, spender, amount, expiration_ledger);
     }
 
     fn balance(e: Env, id: Address) -> i128 {
-        e.storage().instance().bump(INSTANCE_BUMP_THREASHOLD,INSTANCE_BUMP_AMOUNT);
+        e.storage()
+            .instance()
+            .extend_ttl(INSTANCE_BUMP_THREASHOLD, INSTANCE_BUMP_AMOUNT);
         read_balance(&e, id)
     }
 
     fn spendable_balance(e: Env, id: Address) -> i128 {
-        e.storage().instance().bump(INSTANCE_BUMP_THREASHOLD,INSTANCE_BUMP_AMOUNT);
+        e.storage()
+            .instance()
+            .extend_ttl(INSTANCE_BUMP_THREASHOLD, INSTANCE_BUMP_AMOUNT);
         read_balance(&e, id)
     }
 
     fn authorized(e: Env, id: Address) -> bool {
-        e.storage().instance().bump(INSTANCE_BUMP_THREASHOLD,INSTANCE_BUMP_AMOUNT);
+        e.storage()
+            .instance()
+            .extend_ttl(INSTANCE_BUMP_THREASHOLD, INSTANCE_BUMP_AMOUNT);
         is_authorized(&e, id)
     }
 
     fn transfer(e: Env, from: Address, to: Address, amount: i128) {
         from.require_auth();
         check_nonnegative_amount(amount);
-        e.storage().instance().bump(INSTANCE_BUMP_THREASHOLD,INSTANCE_BUMP_AMOUNT);
+        e.storage()
+            .instance()
+            .extend_ttl(INSTANCE_BUMP_THREASHOLD, INSTANCE_BUMP_AMOUNT);
 
         let asset_controller = read_asset_controller(&e);
         let asset_controller_client = asset_controller_contract::Client::new(&e, &asset_controller);
 
-        asset_controller_client.review_transfer(&from,&to, &amount);
+        let sub_invocation_args: Vec<Val> = vec![
+            &e,
+            (&from).into_val(&e),
+            (&to).into_val(&e),
+            (&amount).into_val(&e),
+        ];
 
+        e.authorize_as_current_contract(vec![
+            &e,
+            InvokerContractAuthEntry::Contract(SubContractInvocation {
+                context: ContractContext {
+                    contract: asset_controller,
+                    fn_name: Symbol::new(&e, "review_transfer"),
+                    args: sub_invocation_args.clone(),
+                },
+                sub_invocations: vec![&e],
+            }),
+        ]);
+        asset_controller_client.review_transfer(&from, &to, &amount);
 
         spend_balance(&e, from.clone(), amount);
         receive_balance(&e, to.clone(), amount);
@@ -247,7 +234,9 @@ impl RegulatedAssetTrait for RegulatedAsset {
 
         check_nonnegative_amount(amount);
 
-        e.storage().instance().bump(INSTANCE_BUMP_THREASHOLD,INSTANCE_BUMP_AMOUNT);
+        e.storage()
+            .instance()
+            .extend_ttl(INSTANCE_BUMP_THREASHOLD, INSTANCE_BUMP_AMOUNT);
 
         spend_allowance(&e, from.clone(), spender, amount);
         spend_balance(&e, from.clone(), amount);
@@ -260,7 +249,9 @@ impl RegulatedAssetTrait for RegulatedAsset {
 
         check_nonnegative_amount(amount);
 
-        e.storage().instance().bump(INSTANCE_BUMP_THREASHOLD,INSTANCE_BUMP_AMOUNT);
+        e.storage()
+            .instance()
+            .extend_ttl(INSTANCE_BUMP_THREASHOLD, INSTANCE_BUMP_AMOUNT);
 
         spend_balance(&e, from.clone(), amount);
         event::burn(&e, from, amount);
@@ -271,7 +262,9 @@ impl RegulatedAssetTrait for RegulatedAsset {
 
         check_nonnegative_amount(amount);
 
-        e.storage().instance().bump(INSTANCE_BUMP_THREASHOLD,INSTANCE_BUMP_AMOUNT);
+        e.storage()
+            .instance()
+            .extend_ttl(INSTANCE_BUMP_THREASHOLD, INSTANCE_BUMP_AMOUNT);
 
         spend_allowance(&e, from.clone(), spender, amount);
         spend_balance(&e, from.clone(), amount);
@@ -283,7 +276,9 @@ impl RegulatedAssetTrait for RegulatedAsset {
         let admin = read_administrator(&e);
         admin.require_auth();
 
-        e.storage().instance().bump(INSTANCE_BUMP_THREASHOLD,INSTANCE_BUMP_AMOUNT);
+        e.storage()
+            .instance()
+            .extend_ttl(INSTANCE_BUMP_THREASHOLD, INSTANCE_BUMP_AMOUNT);
 
         spend_balance(&e, from.clone(), amount);
         event::clawback(&e, admin, from, amount);
@@ -293,7 +288,9 @@ impl RegulatedAssetTrait for RegulatedAsset {
         let admin = read_administrator(&e);
         admin.require_auth();
 
-        e.storage().instance().bump(INSTANCE_BUMP_THREASHOLD,INSTANCE_BUMP_AMOUNT);
+        e.storage()
+            .instance()
+            .extend_ttl(INSTANCE_BUMP_THREASHOLD, INSTANCE_BUMP_AMOUNT);
 
         write_authorization(&e, id.clone(), authorize);
         event::set_authorized(&e, admin, id, authorize);
@@ -304,7 +301,9 @@ impl RegulatedAssetTrait for RegulatedAsset {
         let admin = read_administrator(&e);
         admin.require_auth();
 
-        e.storage().instance().bump(INSTANCE_BUMP_THREASHOLD,INSTANCE_BUMP_AMOUNT);
+        e.storage()
+            .instance()
+            .extend_ttl(INSTANCE_BUMP_THREASHOLD, INSTANCE_BUMP_AMOUNT);
 
         receive_balance(&e, to.clone(), amount);
         event::mint(&e, admin, to, amount);
@@ -314,7 +313,9 @@ impl RegulatedAssetTrait for RegulatedAsset {
         let admin = read_administrator(&e);
         admin.require_auth();
 
-        e.storage().instance().bump(INSTANCE_BUMP_THREASHOLD,INSTANCE_BUMP_AMOUNT);
+        e.storage()
+            .instance()
+            .extend_ttl(INSTANCE_BUMP_THREASHOLD, INSTANCE_BUMP_AMOUNT);
 
         write_administrator(&e, &new_admin);
         event::set_admin(&e, admin, new_admin);
@@ -331,5 +332,4 @@ impl RegulatedAssetTrait for RegulatedAsset {
     fn symbol(e: Env) -> String {
         read_symbol(&e)
     }
-
 }

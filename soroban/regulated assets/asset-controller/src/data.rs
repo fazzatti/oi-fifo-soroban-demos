@@ -1,4 +1,6 @@
-use crate::storage_types::{AccountActivityData, DataKey, INSTANCE_BUMP_AMOUNT, INSTANCE_BUMP_THREASHOLD};
+use crate::storage_types::{
+    AccountActivityData, DataKey, INSTANCE_BUMP_AMOUNT, INSTANCE_BUMP_THREASHOLD,
+};
 use soroban_sdk::{vec, Address, Env};
 
 const LEDGER_TIME_SECONDS: u32 = 5;
@@ -11,7 +13,9 @@ pub fn read_outflow_limit(e: &Env) -> i128 {
 pub fn write_outflow_limit(e: &Env, amount: i128) {
     let key = DataKey::OutflowLimit;
     e.storage().instance().set(&key, &amount);
-    e.storage().instance().bump(INSTANCE_BUMP_THREASHOLD,INSTANCE_BUMP_AMOUNT);
+    e.storage()
+        .instance()
+        .extend_ttl(INSTANCE_BUMP_THREASHOLD, INSTANCE_BUMP_AMOUNT);
 }
 pub fn read_inflow_limit(e: &Env) -> i128 {
     let key = DataKey::InflowLimit;
@@ -21,7 +25,9 @@ pub fn read_inflow_limit(e: &Env) -> i128 {
 pub fn write_inflow_limit(e: &Env, amount: i128) {
     let key = DataKey::InflowLimit;
     e.storage().instance().set(&key, &amount);
-    e.storage().instance().bump(INSTANCE_BUMP_THREASHOLD,INSTANCE_BUMP_AMOUNT);
+    e.storage()
+        .instance()
+        .extend_ttl(INSTANCE_BUMP_THREASHOLD, INSTANCE_BUMP_AMOUNT);
 }
 
 pub fn read_probation_period(e: &Env) -> u64 {
@@ -32,7 +38,9 @@ pub fn read_probation_period(e: &Env) -> u64 {
 pub fn write_probation_period(e: &Env, amount: u64) {
     let key = DataKey::ProbationPeriod;
     e.storage().instance().set(&key, &amount);
-    e.storage().instance().bump(INSTANCE_BUMP_THREASHOLD,INSTANCE_BUMP_AMOUNT);
+    e.storage()
+        .instance()
+        .extend_ttl(INSTANCE_BUMP_THREASHOLD, INSTANCE_BUMP_AMOUNT);
 }
 
 pub fn read_quota_time_limit(e: &Env) -> u64 {
@@ -43,7 +51,9 @@ pub fn read_quota_time_limit(e: &Env) -> u64 {
 pub fn write_quota_time_limit(e: &Env, amount: u64) {
     let key = DataKey::QuotaTimeLimit;
     e.storage().instance().set(&key, &amount);
-    e.storage().instance().bump(INSTANCE_BUMP_THREASHOLD,INSTANCE_BUMP_AMOUNT);
+    e.storage()
+        .instance()
+        .extend_ttl(INSTANCE_BUMP_THREASHOLD, INSTANCE_BUMP_AMOUNT);
 }
 
 // The account probation defines how long an account still
@@ -62,7 +72,9 @@ pub fn read_account_probation_start(e: &Env, id: &Address) -> u64 {
 pub fn write_account_probation_start(e: &Env, id: &Address, start: u64) {
     let key = DataKey::AccountProbationStart(id.clone());
     e.storage().instance().set(&key, &start);
-    e.storage().instance().bump(INSTANCE_BUMP_THREASHOLD,INSTANCE_BUMP_AMOUNT);
+    e.storage()
+        .instance()
+        .extend_ttl(INSTANCE_BUMP_THREASHOLD, INSTANCE_BUMP_AMOUNT);
 }
 
 //
@@ -93,11 +105,11 @@ pub fn read_account_activity(e: &Env, id: &Address) -> AccountActivityData {
 pub fn write_account_activity(e: &Env, id: Address, account_activity: AccountActivityData) {
     let key = DataKey::AccountActivity(id);
     e.storage().temporary().set(&key, &account_activity);
-    let bump_amount =get_temporary_bump_amount(&e);
-    let bump_threashold = bump_amount/2;
+    let bump_amount = get_temporary_bump_amount(&e);
+    let bump_threashold = bump_amount / 2;
     e.storage()
         .temporary()
-        .bump(&key,bump_threashold,bump_amount );
+        .extend_ttl(&key, bump_threashold, bump_amount);
 }
 
 fn get_temporary_bump_amount(e: &Env) -> u32 {
