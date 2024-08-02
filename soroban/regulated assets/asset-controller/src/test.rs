@@ -4,8 +4,15 @@ extern crate std;
 use crate::contract::AssetControllerClient;
 
 use soroban_sdk::{
+    auth::{ContractContext, InvokerContractAuthEntry, SubContractInvocation},
     testutils::{Address as _, Ledger},
-    vec, Address, Env, String,
+    vec,
+    xdr::{
+        InvokeContractArgs, ScAddress, ScError, ScErrorCode, ScVal, SorobanAddressCredentials,
+        SorobanAuthorizationEntry, SorobanAuthorizedFunction, SorobanAuthorizedInvocation,
+        SorobanCredentials, StringM, ToXdr, VecM,
+    },
+    Address, Env, Error, IntoVal, String, Symbol, TryIntoVal, Val, Vec,
 };
 
 mod asset_contract {
@@ -47,8 +54,8 @@ fn initialize_use_cases<'a>() -> (
 
     // Regulated Asset Parameters
     let decimal: u32 = 7;
-    let name = String::from_slice(&e, "Fifocoin");
-    let symbol = String::from_slice(&e, "Fifo");
+    let name = String::from_str(&e, "Fifocoin");
+    let symbol = String::from_str(&e, "Fifo");
 
     // Asset Controller Parameters
     let probation_period: u64 = 60_000;
@@ -657,4 +664,14 @@ fn account_probation_period() {
 
     ra_client.transfer(&user_b, &user_c, &2000);
     e.budget().reset_default();
+}
+
+#[test]
+#[should_panic]
+fn avoid_direct_invocation() {
+    let (e, ac_client, ra_client, _admin, user_a, user_b, user_c) = initialize_use_cases();
+
+    e.set_auths(&[]);
+
+    ac_client.review_transfer(&user_a, &user_b, &100);
 }
