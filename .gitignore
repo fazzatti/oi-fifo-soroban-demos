@@ -16,3 +16,5 @@ Cargo.lock
 test_snapshots
 
 .bindings
+
+node_modules
