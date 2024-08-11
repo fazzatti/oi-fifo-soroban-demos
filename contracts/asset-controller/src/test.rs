@@ -5,8 +5,7 @@ use crate::contract::AssetControllerClient;
 
 use soroban_sdk::{
     testutils::{Address as _, Ledger},
-    token::{self, TokenClient},
-    vec, Address, Env, String,
+    token::{self, TokenClient}, Address, Env,
 };
 
 //
@@ -109,7 +108,7 @@ fn initialize_use_cases<'a>() -> (
 
 #[test]
 fn test() {
-    let (e, ac_client, wr_client, sac_client, a_client, admin, user_a, user_b, user_c) =
+    let (_e, ac_client, _wr_client, _sac_client, a_client, admin, _user_a, _user_b, _user_c) =
         initialize_use_cases();
 
     //
