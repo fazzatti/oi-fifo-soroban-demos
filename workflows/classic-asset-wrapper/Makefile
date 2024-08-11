@@ -19,14 +19,14 @@ BLUE = [34m
 RESET = [0m
 
 help h: 
-	@echo.
+	@echo
 	@echo $(CYAN)MAKE HELP: $(RESET)
-	@echo.
+	@echo
 	@echo Use the comand 'make' followed by the desired target.
 	@echo For example: $(BLUE)make deploy-asset-controller $(RESET)
-	@echo.
+	@echo
 	@echo Also, feel free to directly edit this file to customize the parameters with your own values.
-	@echo.
+	@echo
 
 	@echo $(YELLOW)Configuration scripts$(RESET)
 	@echo $(BLUE)make $(GREEN)deploy-asset-controller:$(RESET)                      Deploy the asset controller contract to testnet and logs both the contract id and wasm hash
@@ -37,15 +37,15 @@ help h:
 	@echo $(YELLOW)Tests$(RESET)
 	@echo $(BLUE)make $(GREEN)test-asset-controller-e2e:$(RESET)                    Runs end-to-end tests for the combination of the Classic Wrapper with the Asset Controller contracts in testnet.
 	
-	@echo.
+	@echo
 
 
 
 deploy-asset-controller:
-	npx ts-node $(UPLOAD_AND_DEPLOY_SCRIPT) $(WASM_DIR)/$(WASM_ASSET_CONTROLLER_FILE)
+	npx ts-node -r tsconfig-paths/register $(UPLOAD_AND_DEPLOY_SCRIPT) $(WASM_DIR)/$(WASM_ASSET_CONTROLLER_FILE)
 
 deploy-wrapper:
-	npx ts-node $(UPLOAD_AND_DEPLOY_SCRIPT) $(WASM_DIR)/$(WASM_WRAPPER_FILE)
+	npx ts-node -r tsconfig-paths/register $(UPLOAD_AND_DEPLOY_SCRIPT) $(WASM_DIR)/$(WASM_WRAPPER_FILE)
 
 generate-bindings-asset-controller:
 	$(STELLAR_CLI) contract bindings typescript --contract-id $(ASSET_CONTROLLER_CONTRACT_ID) --output-dir $(BINDINGS_DIR)/asset_controller --network testnet
