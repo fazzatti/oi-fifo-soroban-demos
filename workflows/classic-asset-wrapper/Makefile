@@ -42,10 +42,10 @@ help h:
 
 
 deploy-asset-controller:
-	npx ts-node $(UPLOAD_AND_DEPLOY_SCRIPT) $(WASM_DIR)/$(WASM_ASSET_CONTROLLER_FILE)
+	npx ts-node -r tsconfig-paths/register $(UPLOAD_AND_DEPLOY_SCRIPT) $(WASM_DIR)/$(WASM_ASSET_CONTROLLER_FILE)
 
 deploy-wrapper:
-	npx ts-node $(UPLOAD_AND_DEPLOY_SCRIPT) $(WASM_DIR)/$(WASM_WRAPPER_FILE)
+	npx ts-node -r tsconfig-paths/register $(UPLOAD_AND_DEPLOY_SCRIPT) $(WASM_DIR)/$(WASM_WRAPPER_FILE)
 
 generate-bindings-asset-controller:
 	$(STELLAR_CLI) contract bindings typescript --contract-id $(ASSET_CONTROLLER_CONTRACT_ID) --output-dir $(BINDINGS_DIR)/asset_controller --network testnet
