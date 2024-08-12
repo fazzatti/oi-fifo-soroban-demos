@@ -1,19 +1,20 @@
 [workspace]
-members = ["soroban/regulated assets/*"]
-exclude = ["soroban/regulated assets/scripts/"]
+members = [
+"contracts/*",
+# "classic-asset-wrapper-interface/",
+#  "regulated-token/",
+ ]
+# exclude = ["soroban/classic-asset-wrapper/scripts/", "soroban/regulated classic asset/scripts/"]
 resolver = "2"
 
 [workspace.dependencies]
-# soroban-sdk = "0.9.2"
-# soroban-token-sdk = { version = "0.9.2" }
 soroban-sdk = "21.4.0"
 soroban-token-sdk = { version = "21.4.0" }
 
 [workspace.dev_dependencies]
 soroban-sdk = "21.4.0"
 soroban-token-sdk = { version = "21.4.0" }
-# soroban-sdk = "0.9.2"
-# soroban-token-sdk = { version = "0.9.2" }
+
 
 
 [profile.release]
