@@ -11,7 +11,7 @@ use soroban_sdk::{
 
 mod asset_controller_contract {
     soroban_sdk::contractimport!(
-        file = "../../target/wasm32-unknown-unknown/release/asset_controller.wasm"
+        file = "../../target/wasm32-unknown-unknown/release/regulated_token_controller.wasm"
     );
 }
 
