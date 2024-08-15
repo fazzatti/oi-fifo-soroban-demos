@@ -1,11 +1,16 @@
 #![cfg(test)]
 extern crate std;
 
-use crate::contract::AssetControllerClient;
+use crate::contract::{self, AssetControllerClient};
+use standard_traits::classic_wrapper::enforced::{
+    ClassicWrapperClient, EnforcedClassicWrapperInterfaceTrait,
+};
 
 use soroban_sdk::{
+    contractimport,
     testutils::{Address as _, Ledger},
-    token::{self, TokenClient}, Address, Env,
+    token::{self, TokenClient},
+    Address, Env,
 };
 
 //
@@ -22,7 +27,7 @@ use soroban_sdk::{
 
 mod wrapper_contract {
     soroban_sdk::contractimport!(
-        file = "../../target/wasm32-unknown-unknown/release/wrapper_interface.wasm"
+        file = "../../target/wasm32-unknown-unknown/release/enforced_classic_asset_wrapper.wasm"
     );
 }
 

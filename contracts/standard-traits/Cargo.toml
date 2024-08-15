@@ -1,18 +1,12 @@
 [package]
-name = "asset-controller"
+name = "standard-traits"
 version = "0.1.0"
 edition = "2021"
 
-[lib]
-crate-type = ["cdylib"]
-
-[features]
-testutils = ["soroban-sdk/testutils"]
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 soroban-sdk = { workspace = true }
-standard-traits = {path = "../standard-traits"}
-
 
 [dev_dependencies]
 soroban-sdk = { workspace = true, features = ["testutils"] }

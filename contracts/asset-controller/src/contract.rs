@@ -17,18 +17,9 @@ use crate::validations::{
     is_authorized_by_admin, is_contract_initialized, is_invoker_the_asset_contract,
 };
 use soroban_sdk::{contract, contractimpl, vec, Address, Env, Vec};
+use standard_traits::asset_controller::AssetControllerTrait;
 
-//
-// This implementation follows closely the original Regulated Token
-// Controller(contracts/regulated-token-controller) with a few changes.
-// Mainly it cannot be used with the pure soroban token approach instead of
-// a classic asset due to it also verifying the accounts trustline states
-// during a transfer review, which would cause a re-entrance to the token
-// contract which is not allowed.
-// Wrapped classic assets won't face this issue since the Wrapper Interface
-// is a separate contract from the default SAC(Stellar Asset Contract).
-//
-pub trait AssetControllerTrait {
+pub trait ProbationTrait {
     // -------------------------------------------------------------------------------
     // Inititalization Parameters
     //--------------------------------------------------------------------------------
@@ -63,19 +54,6 @@ pub trait AssetControllerTrait {
     ///
     /// if `reset_quotas` is true, the current account's quotas will be reset.
     fn set_probation_start(env: Env, id: Address, probation_start: u64, reset_quotas: bool);
-
-    // --------------------------------------------------------------------------------
-    // Transaction Auditing Functions
-    // --------------------------------------------------------------------------------
-    // These transactions apply the validation rules to the
-    // transactions triggered by the regulated asset contract.
-    // They can only be invoked by the registered asset contract
-    // which can be verified with function `is_invoker_the_asset_contract()`
-
-    /// Process a simple transfer transaction
-    /// enforcing inflow and outflow rules
-    ///
-    fn review_transfer(env: Env, from: Address, to: Address, amount: i128);
 
     // --------------------------------------------------------------------------------
     // Read-only
@@ -113,6 +91,28 @@ pub struct AssetController;
 
 #[contractimpl]
 impl AssetControllerTrait for AssetController {
+    fn review_transfer(e: Env, from: Address, to: Address, amount: i128) {
+        is_contract_initialized(&e);
+        is_invoker_the_asset_contract(&e);
+
+        if is_account_in_probation(&e, &from) {
+            has_spender_achieved_outflow_limit(&e, &from, amount);
+            record_transaction(&e, from.clone(), amount, true);
+
+            event_consumed_quota_out(&e, from, amount);
+        }
+
+        if is_account_in_probation(&e, &to) {
+            has_receiver_achieved_inflow_limit(&e, &to, amount);
+            record_transaction(&e, to.clone(), amount, false);
+
+            event_consumed_quota_in(&e, to, amount);
+        }
+    }
+}
+
+#[contractimpl]
+impl ProbationTrait for AssetController {
     fn initialize(
         e: Env,
         admin: Address,
@@ -144,25 +144,6 @@ impl AssetControllerTrait for AssetController {
 
         if reset_quotas {
             clear_recorded_transactions(&e, id)
-        }
-    }
-
-    fn review_transfer(e: Env, from: Address, to: Address, amount: i128) {
-        is_contract_initialized(&e);
-        is_invoker_the_asset_contract(&e);
-
-        if is_account_in_probation(&e, &from) {
-            has_spender_achieved_outflow_limit(&e, &from, amount);
-            record_transaction(&e, from.clone(), amount, true);
-
-            event_consumed_quota_out(&e, from, amount);
-        }
-
-        if is_account_in_probation(&e, &to) {
-            has_receiver_achieved_inflow_limit(&e, &to, amount);
-            record_transaction(&e, to.clone(), amount, false);
-
-            event_consumed_quota_in(&e, to, amount);
         }
     }
 

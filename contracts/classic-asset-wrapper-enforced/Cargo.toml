@@ -1,5 +1,5 @@
 [package]
-name = "asset-controller"
+name = "enforced-classic-asset-wrapper"
 version = "0.1.0"
 edition = "2021"
 
