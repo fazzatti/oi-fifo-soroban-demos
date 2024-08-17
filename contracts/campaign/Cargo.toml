@@ -11,6 +11,7 @@ testutils = ["soroban-sdk/testutils"]
 
 [dependencies]
 soroban-sdk = { workspace = true }
+standard-traits = {path = "../standard-traits"}
 
 
 [dev_dependencies]

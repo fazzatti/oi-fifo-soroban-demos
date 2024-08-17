@@ -1,21 +1,31 @@
-# Soroban Project
+# Optional Classic Asset Wrapper contract
 
-## Project Structure
+The Optional Classic Asset Wrapper contract implements an optional classic wrapper interface to provide an alternative way of interacting with a classic asset, enabling extended custom behavior.
 
-This repository uses the recommended structure for a Soroban project:
-```text
-.
-├── contracts
-│   └── hello_world
-│       ├── src
-│       │   ├── lib.rs
-│       │   └── test.rs
-│       └── Cargo.toml
-├── Cargo.toml
-└── README.md
+# Getting Started
+
+Follow the steps below to deploy and interact with the Optional Classic Asset Wrapper contract:
+
+## Install Dependencies
+
+1. `stellar-cli v21.3.0`. See https://github.com/stellar/stellar-cli
+
+## Building the contract
+
+Run the command below to compile the contracts in this workspace:
+
+```bash
+stellar contract build
 ```
 
-- New Soroban contracts can be put in `contracts`, each in their own directory. There is already a `hello_world` contract in there to get you started.
-- If you initialized this project with any other example contracts via `--with-example`, those contracts will be in the `contracts` directory as well.
-- Contracts should have their own `Cargo.toml` files that rely on the top-level `Cargo.toml` workspace for their dependencies.
-- Frontend libraries can be added to the top-level directory as well. If you initialized this project with a frontend template via `--frontend-template` you will have those files already included.
+## Using the contracts
+
+For more detailed steps to interact with this contract, check out the workflow project under `workflows/classic-asset-wrapper`.
+
+## Running Tests
+
+The tests are located under `src/test.rs` and can be triggered with the following command:
+
+```bash
+cargo test
+```

@@ -1,9 +1,3 @@
-use soroban_sdk::{contract, contractimpl, token, vec, Address, Env};
-use standard_traits::classic_wrapper::common::{
-    read_admin, read_asset, read_metadata, write_admin, write_is_active, write_metadata,
-    WrapperMetadata,
-};
-
 use crate::account_authorization::{
     execute_with_temporary_authorizations, set_account_authorization,
 };
@@ -13,7 +7,13 @@ use crate::validations::{
     is_admin_validation, is_contract_initialized_validation,
     is_contract_not_initialized_validation, is_wrapper_active_validation,
 };
+use soroban_sdk::{contract, contractimpl, token, vec, Address, Env};
+use standard_traits::classic_wrapper::common::{
+    read_admin, read_asset, read_metadata, write_admin, write_is_active, write_metadata,
+    WrapperMetadata,
+};
 use standard_traits::classic_wrapper::enforced::EnforcedClassicWrapperInterfaceTrait;
+
 pub trait SpecifcFeaturesTrait {
     //
     // Important: Different from the pure soroban regulated asset,
@@ -77,7 +77,7 @@ impl EnforcedClassicWrapperInterfaceTrait for WrapperInterface {
     }
 
     // --------------------------------------------------------------------------------
-    // Asset interface
+    // Asset Functions
     // --------------------------------------------------------------------------------
     //
     fn transfer(e: Env, from: Address, to: Address, amount: i128) {

@@ -30,7 +30,7 @@ import { Methods } from "./constants";
 import { readTxInvocation } from "@src/utils/admin";
 import { ContractEngineConstructorArgs } from "stellar-plus/lib/stellar-plus/core/contract-engine/types";
 
-export class AssetController extends ContractEngine {
+export class Probation extends ContractEngine {
   public adminPublicKey: string = "";
   public wrapperContractId: string = "";
   public assetContractId: string = "";

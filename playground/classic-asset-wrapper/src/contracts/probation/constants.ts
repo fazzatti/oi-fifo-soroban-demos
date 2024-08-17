@@ -1,7 +1,7 @@
 import { Core } from "stellar-plus/lib/stellar-plus/core";
 
 export const wasmPath =
-  "../../target/wasm32-unknown-unknown/release/asset_controller.wasm";
+  "../../target/wasm32-unknown-unknown/release/probation.wasm";
 
 export enum Methods {
   Initialize = "initialize",

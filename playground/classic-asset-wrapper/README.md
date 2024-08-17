@@ -1,4 +1,4 @@
-# Classic Asset Wrapper Workflow
+# Classic Asset Wrapper Playground
 
 This subproject containes some helper scripts and tests to play around the Classic Asset Wrapper use case.
 
@@ -36,12 +36,15 @@ This command should output the help details of all commands available and their 
 
 As this repository grows over time, the objective is to share different use cases and approaches on how to implement and use the Classic Asset wrapper. See the following subsections for specifics of these use cases.
 
-## Asset Controller
+## Probation
 
 **Type:** Hard Wrapper
-**Directory:** `contracts/asset-controlle`
+**Directory:**
 
-The Asset Controller use case implements specific rules to an asset. These apply a probation period during which users will have limits enforced upon to their transactions.
+- Asset Controller: `contracts/probation`
+- Enforced Classic Wrapper: `contracts/enforced-wrapper`
+
+The Probation use case implements specific rules to an asset. These apply a probation period during which users will have limits enforced upon to their transactions.
 
 ## Features
 
@@ -58,3 +61,32 @@ After the probation period ends or the asset admin approves their trustline, the
 - **Inflow Quota**: Analogous to the outflow quota, during probation, there's a cap on the amount an account can receive, defined by the asset administrator. This quota too resets after the asset-specific time period.
 
   > **Important** Both inflow and outflow quotas are managed separatelly.
+
+## Probation
+
+**Type:** Soft Wrapper
+**Directory:**
+
+- Asset Controller: `contracts/campaign`
+- Optional Classic Wrapper: `contracts/optional-wrapper`
+
+The Campaign use case implements optional rules to apply a campaign in which accounts accumulate points at each transaction until a threshold is met and they earn a prize in tokens.
+
+## Features
+
+Once initialized, and funded by the admin, whenever a user transacts with the asset wrapper that integrates this controller, they will be affected by its rules. As an optional wrapper, users can simple opt-out by directly transaction through the SAC or Classic asset.
+
+At each transaction, the user will accumulate points in relation to the transacted amount. When a defined target is reached, the user will then receive the token prize automatically.
+
+After the campaign period or the campaign funds end, the campaing will be over and no more points or prizes will be processed.
+
+- **Prize Amount**: The amount of tokens the user will receive from the campaign funds once they reach the goal.
+- **Target Points**: How many points an account needs to collect in order to receive the prize.
+
+- **Inflow Points Multiplier**: This multiplier represents how many points a receiving account will collect in relation to the amount transacted.
+
+- **Outflow Points Multiplier**: This multiplier represents how many points a sender account will collect in relation to the amount transacted.
+
+- **Wait Interval**: Defines how long an account must wait after winning the prize for their transactions to start collecting points again. This ensures accounts can't spam transactions and deplete the campaign funds.
+
+- **End Date**: The deadline for the campaign. After this date, the campaign will stop collecting points and distributing prizes. If the funds are depleted before this date, the campaign will also stop until its funds are replenished by the admin.

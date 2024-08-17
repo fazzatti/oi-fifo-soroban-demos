@@ -1,11 +1,16 @@
 use soroban_sdk::{token, Address, Env};
 
 use crate::storage::{
-    read_asset, read_end_date, read_inflow_points, read_outflow_points, read_prize_amount,
-    read_target_points, read_user_data, read_wait_interval, write_user_data, UserData,
+    read_admin, read_asset, read_end_date, read_inflow_points, read_outflow_points,
+    read_prize_amount, read_target_points, read_user_data, read_wait_interval, write_user_data,
+    UserData,
 };
 
 pub fn proccess_user_transfer(env: &Env, user: Address, amount: i128, is_sender: bool) {
+    if user == read_admin(env) {
+        return;
+    }
+
     let user_data = read_user_data(&env, user.clone());
 
     if is_elligible_for_transfer(&env, user_data.clone()) && is_there_enough_balance_for_prize(&env)
@@ -24,7 +29,7 @@ pub fn proccess_user_transfer(env: &Env, user: Address, amount: i128, is_sender:
         if new_user_data.points >= read_target_points(&env) {
             distribute_prize(env, user.clone());
             new_user_data.points = 0;
-            new_user_data.wait_until = env.ledger().timestamp() + read_wait_interval(&env) * 1000;
+            new_user_data.wait_until = env.ledger().timestamp() + read_wait_interval(&env);
         }
 
         write_user_data(&env, user, &new_user_data);

@@ -1,8 +1,8 @@
-import { AssetController } from "@src/contracts/asset-controller";
+import { Probation } from "@src/contracts/probation";
 import {
-  wasmPath as assetControllerWasmPath,
+  wasmPath as probationWasmPath,
   spec as acSpec,
-} from "@src/contracts/asset-controller/constants";
+} from "@src/contracts/probation/constants";
 import { EnforcedClassicWrapper as ClassicWrapper } from "@src/contracts/enforced-wrapper";
 import {
   spec as wrSpec,
@@ -26,13 +26,13 @@ import {
 describe("End-to-end Classic Wrapper Test with Asset Controller", () => {
   let sac: SACHandler;
   let wrapper: ClassicWrapper;
-  let assetController: AssetController;
+  let probation: Probation;
   let admin: DefaultAccountHandler;
   let networkConfig: NetworkConfig;
 
   beforeAll(async () => {
     const wrapperWasm = await loadWasmFile(wrapperWasmPath);
-    const assetControllerWasm = await loadWasmFile(assetControllerWasmPath);
+    const probationWasm = await loadWasmFile(probationWasmPath);
 
     networkConfig = TestNet();
     admin = await getAdmin();
@@ -45,10 +45,10 @@ describe("End-to-end Classic Wrapper Test with Asset Controller", () => {
       },
       asset: sac,
     });
-    assetController = new AssetController({
+    probation = new Probation({
       networkConfig,
       contractParameters: {
-        wasm: assetControllerWasm,
+        wasm: probationWasm,
         spec: acSpec,
       },
     });
@@ -78,10 +78,10 @@ describe("End-to-end Classic Wrapper Test with Asset Controller", () => {
   describe("During Setup", () => {
     it("should upload the Asset Controller contract", async () => {
       await expect(
-        assetController.uploadWasm(adminTxInvocation())
+        probation.uploadWasm(adminTxInvocation())
       ).resolves.toBeDefined();
 
-      expect(assetController.getWasmHash()).toMatch(wasmHashRegex);
+      expect(probation.getWasmHash()).toMatch(wasmHashRegex);
     });
 
     it("should upload the Classic Wrapper contract", async () => {
@@ -94,10 +94,10 @@ describe("End-to-end Classic Wrapper Test with Asset Controller", () => {
 
     it("should deploy a new instance of the Asset Controller contract", async () => {
       await expect(
-        assetController.deploy(adminTxInvocation())
+        probation.deploy(adminTxInvocation())
       ).resolves.toBeDefined();
 
-      expect(assetController.getContractId()).toMatch(contractIdRegex);
+      expect(probation.getContractId()).toMatch(contractIdRegex);
     });
 
     it("should deploy a new instance of the Classic Wrapper contract", async () => {
@@ -108,7 +108,7 @@ describe("End-to-end Classic Wrapper Test with Asset Controller", () => {
 
     it("should initialize the Asset Controller contract with the proper parameters", async () => {
       await expect(
-        assetController.initialize({
+        probation.initialize({
           ...adminTxInvocation(),
           admin: admin.getPublicKey(),
           wrapper: wrapper.getContractId(),
@@ -120,12 +120,12 @@ describe("End-to-end Classic Wrapper Test with Asset Controller", () => {
         })
       ).resolves.toBeDefined();
 
-      const fetchedProbationPeriod = await assetController.getProbationPeriod();
-      const fetchedQuotaTimeLimit = await assetController.getQuotaTimeLimit();
-      const fetchedInflowLimit = await assetController.getInflowLimit();
-      const fetchedOutflowLimit = await assetController.getOutflowLimit();
-      const fetchedAdmin = await assetController.getAdmin();
-      const fetchedAsset = await assetController.getAsset();
+      const fetchedProbationPeriod = await probation.getProbationPeriod();
+      const fetchedQuotaTimeLimit = await probation.getQuotaTimeLimit();
+      const fetchedInflowLimit = await probation.getInflowLimit();
+      const fetchedOutflowLimit = await probation.getOutflowLimit();
+      const fetchedAdmin = await probation.getAdmin();
+      const fetchedAsset = await probation.getAsset();
 
       expect(fetchedProbationPeriod.toString()).toBe(600n.toString());
       expect(fetchedQuotaTimeLimit.toString()).toBe(300n.toString());
@@ -140,7 +140,7 @@ describe("End-to-end Classic Wrapper Test with Asset Controller", () => {
         wrapper.initialize({
           ...adminTxInvocation(),
           admin: admin.getPublicKey(),
-          asset_controller: assetController.getContractId(),
+          asset_controller: probation.getContractId(),
           asset: sac.sorobanTokenHandler.getContractId(),
         })
       ).resolves.toBeDefined();
@@ -205,10 +205,10 @@ describe("End-to-end Classic Wrapper Test with Asset Controller", () => {
 
     describe("After the users are ready", () => {
       it("User A & B >> should not be in probation before starting to interact with the asset directly", async () => {
-        const userAprobation = await assetController.getAccountProbationPeriod(
+        const userAprobation = await probation.getAccountProbationPeriod(
           userA.getPublicKey()
         );
-        const userBprobation = await assetController.getAccountProbationPeriod(
+        const userBprobation = await probation.getAccountProbationPeriod(
           userB.getPublicKey()
         );
 
@@ -226,16 +226,16 @@ describe("End-to-end Classic Wrapper Test with Asset Controller", () => {
           })
         ).resolves.toBeDefined();
 
-        const userAprobation = await assetController.getAccountProbationPeriod(
+        const userAprobation = await probation.getAccountProbationPeriod(
           userA.getPublicKey()
         );
-        const userBprobation = await assetController.getAccountProbationPeriod(
+        const userBprobation = await probation.getAccountProbationPeriod(
           userB.getPublicKey()
         );
-        const userAQuotas = await assetController.getQuotaReleaseTime(
+        const userAQuotas = await probation.getQuotaReleaseTime(
           userA.getPublicKey()
         );
-        const userBQuotas = await assetController.getQuotaReleaseTime(
+        const userBQuotas = await probation.getQuotaReleaseTime(
           userB.getPublicKey()
         );
 
@@ -281,10 +281,10 @@ describe("End-to-end Classic Wrapper Test with Asset Controller", () => {
           })
         ).resolves.toBeDefined();
 
-        const userAprobation = await assetController.getAccountProbationPeriod(
+        const userAprobation = await probation.getAccountProbationPeriod(
           userA.getPublicKey()
         );
-        const userBprobation = await assetController.getAccountProbationPeriod(
+        const userBprobation = await probation.getAccountProbationPeriod(
           userB.getPublicKey()
         );
 
@@ -309,10 +309,10 @@ describe("End-to-end Classic Wrapper Test with Asset Controller", () => {
           })
         ).resolves.toBeDefined();
 
-        const userAprobation = await assetController.getAccountProbationPeriod(
+        const userAprobation = await probation.getAccountProbationPeriod(
           userA.getPublicKey()
         );
-        const userBprobation = await assetController.getAccountProbationPeriod(
+        const userBprobation = await probation.getAccountProbationPeriod(
           userB.getPublicKey()
         );
 
@@ -332,7 +332,7 @@ describe("End-to-end Classic Wrapper Test with Asset Controller", () => {
           })
         ).resolves.toBeDefined();
 
-        const adminprobation = await assetController.getAccountProbationPeriod(
+        const adminprobation = await probation.getAccountProbationPeriod(
           admin.getPublicKey()
         );
 

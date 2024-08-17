@@ -1,10 +1,10 @@
-# Asset Controller contract
+# Probation contract
 
-The Asset Controller contract is a complement to the Classic Asset Wrapper Interface. It implements specific rules to apply a probation period during which users will have limits applied to their transactions.
+The Probation contract is a complement to the Enforced Classic Asset Wrapper Interface. It implements a Asset Controller interface with specific rules to apply a probation period during which users will have limits applied to their transactions.
 
 # Getting Started
 
-Follow the steps below to deploy and interact with the Regulated Asset dApp:
+Follow the steps below to deploy and interact with the Probation contract:
 
 ## Install Dependencies
 
