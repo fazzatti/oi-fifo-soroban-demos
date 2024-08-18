@@ -62,7 +62,7 @@ After the probation period ends or the asset admin approves their trustline, the
 
   > **Important** Both inflow and outflow quotas are managed separatelly.
 
-## Probation
+## Campaign
 
 **Type:** Soft Wrapper
 **Directory:**
