@@ -1,10 +1,6 @@
 [workspace]
-members = [
-"contracts/*",
-# "classic-asset-wrapper-interface/",
-#  "regulated-token/",
- ]
-# exclude = ["soroban/classic-asset-wrapper/scripts/", "soroban/regulated classic asset/scripts/"]
+members = ["contracts/*",  ]
+# members = ["contracts/campaign*", "contracts/standard-traits*" ]
 resolver = "2"
 
 [workspace.dependencies]
