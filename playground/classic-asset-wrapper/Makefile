@@ -4,6 +4,7 @@ ENFORCED_WRAPPER_CONTRACT_ID = CBWTKZ2LDBBD7ZKGOR5NTD6HI3CJRV4SCZMOAPJUF5ASWWKPF
 OPTIONAL_WRAPPER_CONTRACT_ID = CCZT5TYGUEOMDDZUV2BNNI5CZ5ZRRTOA4SVOPEUTB47PPXLXRI3ANQ23
 CAMPAIGN_CONTRACT_ID = CDAJ6XSWXW5Y4UO7MSH53JVCXDPFMKVHJPVNVL56ESUC46IWYIMLYAH4
 COUNTER_CONTRACT_ID = CCLRLRUXXWO3RQNGGGXB6J243VPKAV7R7A4HW7OR2BEKE3KWW2VCXOXK
+PAYMENT_CONTRACT_ID = CA63ILOZDV64CH6MEI7H2PW5OBHURGJXDK5CTXOMW4GYDWH5SSZZJRZS
 
 STELLAR_CLI = stellar
 WASM_DIR = ../../target/wasm32-unknown-unknown/release
@@ -13,6 +14,9 @@ WASM_OPTIONAL_WRAPPER_FILE = optional_classic_asset_wrapper.wasm
 WASM_PROBATION_FILE = probation.wasm
 WASM_CAMPAIGN_FILE = campaign.wasm
 WASM_COUNTER_FILE = counter.wasm
+WASM_PAYMENT_FILE = payment.wasm
+
+
 
 # scripts
 UPLOAD_AND_DEPLOY_SCRIPT = ./src/deploy/upload-and-deploy.ts
@@ -35,10 +39,12 @@ help h:
 
 	@echo $(YELLOW)Configuration scripts$(RESET)
 	@echo $(BLUE)make $(GREEN)deploy-counter:$(RESET)                               Deploy the counter contract to testnet and logs both the contract id and wasm hash
+	@echo $(BLUE)make $(GREEN)deploy-payment:$(RESET)                               Deploy the payment contract to testnet and logs both the contract id and wasm hash
 	@echo $(BLUE)make $(GREEN)deploy-probation:$(RESET)                             Deploy the probation contract to testnet and logs both the contract id and wasm hash
 	@echo $(BLUE)make $(GREEN)deploy-campaign:$(RESET)                              Deploy the campaign contract to testnet and logs both the contract id and wasm hash
 	@echo $(BLUE)make $(GREEN)deploy-enforced-wrapper:$(RESET)                      Deploy the enforced asset wrapper contract to testnet and logs both the contract id and wasm hash
 	@echo $(BLUE)make $(GREEN)deploy-optional-wrapper:$(RESET)                      Deploy the optional asset wrapper contract to testnet and logs both the contract id and wasm hash
+	@echo $(BLUE)make $(GREEN)generate-bindings-payment$(RESET)                     Generate TypeScript bindings for the payment contract and outputs to the ./bindings directory. Make sure the contract is deployed in testnet for it to work. You can customize the contract id by directly changing this file.
 	@echo $(BLUE)make $(GREEN)generate-bindings-probation$(RESET)                   Generate TypeScript bindings for the probation contract and outputs to the ./bindings directory. Make sure the contract is deployed in testnet for it to work. You can customize the contract id by directly changing this file.
 	@echo $(BLUE)make $(GREEN)generate-bindings-campaign$(RESET)                    Generate TypeScript bindings for the campaign contract and outputs to the ./bindings directory. Make sure the contract is deployed in testnet for it to work. You can customize the contract id by directly changing this file.
 	@echo $(BLUE)make $(GREEN)generate-bindings-counter$(RESET)                     Generate TypeScript bindings for the counter contract and outputs to the ./bindings directory. Make sure the contract is deployed in testnet for it to work. You can customize the contract id by directly changing this file.
@@ -49,10 +55,14 @@ help h:
 	@echo $(BLUE)make $(GREEN)test-probation-e2e:$(RESET)                           Runs end-to-end tests for the combination of the Enforced Classic Wrapper with the Probation contracts in testnet.
 	@echo $(BLUE)make $(GREEN)test-campaign-e2e:$(RESET)   					     	Runs end-to-end tests for the combination of the Optional Classic Wrapper with the Campaign contracts in testnet.
 	@echo $(BLUE)make $(GREEN)test-counter-e2e:$(RESET)   					     	Runs end-to-end tests for the combination of the Optional Classic Wrapper with the Counter contracts in testnet.
+	@echo $(BLUE)make $(GREEN)test-payment-e2e:$(RESET)   					     	Runs end-to-end tests for the combination of the Enforced Classic Wrapper with the Payment contracts in testnet.
 
 	@echo 
 
 
+
+deploy-payment:
+	npx ts-node -r tsconfig-paths/register $(UPLOAD_AND_DEPLOY_SCRIPT) $(WASM_DIR)/$(WASM_PAYMENT_FILE)
 
 deploy-counter:
 	npx ts-node -r tsconfig-paths/register $(UPLOAD_AND_DEPLOY_SCRIPT) $(WASM_DIR)/$(WASM_COUNTER_FILE)
@@ -68,6 +78,9 @@ deploy-enforced-wrapper:
 
 deploy-optional-wrapper:
 	npx ts-node -r tsconfig-paths/register $(UPLOAD_AND_DEPLOY_SCRIPT) $(WASM_DIR)/$(WASM_OPTIONAL_WRAPPER_FILE)
+
+generate-bindings-payment:
+	$(STELLAR_CLI) contract bindings typescript --contract-id $(PAYMENT_CONTRACT_ID) --output-dir $(BINDINGS_DIR)/payment --network testnet --overwrite
 
 generate-bindings-probation:
 	$(STELLAR_CLI) contract bindings typescript --contract-id $(PROBATION_CONTRACT_ID) --output-dir $(BINDINGS_DIR)/probation --network testnet --overwrite
@@ -92,3 +105,6 @@ test-campaign-e2e:
 
 test-counter-e2e:
 	npx jest ./src/tests/counter.integration.test.ts
+
+test-payment-e2e:
+	npx jest ./src/tests/payment.integration.test.ts
